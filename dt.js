@@ -120,7 +120,6 @@ function DrawDungeon() {
 		if( drawList[x] ) {
 //									console.log("x - " +x);
 			var div = DrawTile( drawList[x], referenceList[x] );
-			var div2 = DrawTile2( drawList[x], referenceList[x] );
 
 //									console.log(drawList[x]);
 //									console.log( JSON.stringify(drawList) );
@@ -180,47 +179,6 @@ function DrawDungeon() {
 
 }
 function DrawTile( coordinates, referenceCoordinates ) {
-	var queryString = '.col_x.row_y'.replace('x', coordinates[0]).replace('y', coordinates[1]);
-	var div = document.querySelectorAll( queryString )[0];
-
-	var tiles = ['X', 'T1', 'T2', 'T3', 'T4', 'hallway1', 'hallway2', 'hallway1', 'hallway2',  'hallway1', 'hallway2', 'hallway1', 'hallway2',  'hallway1', 'hallway2', 'hallway1', 'hallway2', 'cap1', 'cap2', 'cap3',  'cap4', 'cap1', 'cap2', 'cap3',  'cap4'];
-	if( coordinates == startingCoordinates ) {
-		div.classList.add( 'tile-X' );
-		console.log('(force X)');
-	} else {
-		console.log( coordinates, referenceCoordinates );
-//								console.log( referenceCoordinates );
-//								console.log( row - 1 );
-
-		if( coordinates[0] + 1 == referenceCoordinates[0] ) {
-			/* Border is to the right */
-			tiles = ['X', 'T1', 'T3', 'T4', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'cap3', 'cap3'];
-			console.log('a');
-		} else if( coordinates[0] - 1 == referenceCoordinates[0] ) {
-			/* Border is to the left */
-			tiles = ['X', 'T1', 'T2', 'T3', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'cap1', 'cap1'];
-			console.log('b');
-		} else if( coordinates[1] + 1 == referenceCoordinates[1] ) {
-			/* Border is to the bottom */
-			tiles = ['X', 'T1', 'T2', 'T4', 'hallway2', 'hallway2', 'hallway2', 'hallway2', 'hallway2', 'hallway2', 'cap4', 'cap4'];
-			console.log('c');
-		} else if( coordinates[1] - 1 == referenceCoordinates[1] ) {
-			/* Border is to the top */
-			tiles = ['X', 'T2', 'T3', 'T4', 'hallway2',  'hallway2',  'hallway2',  'hallway2',  'hallway2',  'hallway2',  'cap2',  'cap2'];
-			console.log('d');
-		} else { console.log('else'); }
-
-		randInt = Math.floor( Math.random() * tiles.length);
-//								console.log( JSON.stringify(coordinates) );
-//								console.log( JSON.stringify(referenceCoordinates) );
-//								console.log( tiles );
-		div.classList.add( 'tile-' + tiles[randInt] );
-	}
-	div.classList.replace('tile-blank', 'tile');
-
-	return div;
-}
-function DrawTile2( coordinates, referenceCoordinates ) {
 	var queryString = '.col_x.row_y'.replace('x', coordinates[0]).replace('y', coordinates[1]);
 	var div = document.querySelectorAll( queryString )[0];
 
