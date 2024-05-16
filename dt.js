@@ -283,3 +283,5 @@ function GetTileFromCoordinates( coordinates ) {
 
 	return targetTile;
 }
+
+DrawDungeon();
