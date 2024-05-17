@@ -48,3 +48,5 @@
 	<label for="dungeon_startingRow">Starting Row</label>
 
 </div>
+
+<script type="text/javascript" src="<?php echo get_stylesheet_directory_uri(); ?>/dungeon-tiles/dt.js?v=<?php echo random_int(0,99999); ?>"></script>
