@@ -32,9 +32,9 @@
 
 <div id="dungeon"></div>
 <div id="tools">
-	<button onclick="javascript:DrawDungeon();">Draw Dungeon</button>
+	<button onclick="javascript:ResetDungeon();">Reset Dungeon</button>
 	<hr>
-	<input type="number" id="tool_limit" value="25">
+	<input type="number" id="tool_limit" value="5">
 	<label for="tool_limit">Limit</label>
 	<hr>
 	<input type="number" id="dungeon_width" value="10">
@@ -42,9 +42,12 @@
 	<input type="number" id="dungeon_height" value="10">
 	<label for="dungeon_height">Height</label>
 	<hr>
-	<input type="number" id="dungeon_startingCol" value="5">
+	<input type="number" id="dungeon_startingCol" value="2">
 	<label for="dungeon_startingCol">Starting Col</label>
-	<input type="number" id="dungeon_startingRow" value="5">
+	<input type="number" id="dungeon_startingRow" value="2">
 	<label for="dungeon_startingRow">Starting Row</label>
 
 </div>
+
+
+<script type="text/javascript" src="<?php echo get_stylesheet_directory_uri(); ?>/dungeon-tiles/dt.js?v=<?php echo random_int(0,99999); ?>"></script>

@@ -4,25 +4,71 @@ var gridHeight = 0;
 
 var startCol = 0;
 var startRow = 0;
-var startingCoordinates = [0, 0];
-var tileWidth = 0;
+var drawList = [];
 
-function BuildTileList(id, neighbors) {
-	var tiles = [];
 
-//							for( n in neighbors ) {
-//								if( neighbors[n] ) {
-			var tileId = id - 1; 
-			var paths = DetermineTileWalls( id );
-//								}
-//							}
+function DrawList_AddNeighbors( id  ) {
+	var paths = GetNeighborByTileset( id );
+//	console.log('PATHS', paths);
+	
+	if( paths.left ) { console.log(); drawList.push( paths.left ); }
+	if( paths.right ) { console.log(); drawList.push( paths.right ); }
+	if( paths.top ) { console.log(); drawList.push( paths.top); }
+	if( paths.bottom ) { console.log(); drawList.push( paths.bottom ); }
 }
-function CreateDungeon() {
+function AssignTile( id ) {
+	var tiles = [];
+	var paths = GetNeighborArray( id );
+
+//	console.log( paths );
+	
+	console.log('ID', id);
+	console.log('PATHS', paths);
+	
+	/* Jason */
+	/* Redo this part */
+	/* Currently, it's set to add items additively, based on it's own neighbors. BUT, not based on neighborcards. Either create multiplicitive array logic based on neighbor pairs, or add items to Tiles, then go back and remove conditionally. */
+	
+	/* Add tile options */
+	if( paths.left ) {
+		tiles.push( 'cap1' );
+	}
+	if( paths.top ) {
+		tiles.push( 'cap2' );
+	}
+	if( paths.right ) {
+		tiles.push( 'cap3' );
+	}
+	if( paths.bottom ) {
+		tiles.push( 'cap4' );
+	}
+	
+//	if( paths.left && paths.right ) { tiles.push( 'hallway1' ); }
+//	if( paths.top && paths.bottom ) { tiles.push( 'hallway2' ); }
+
+//	if( paths.left && paths.bottom && paths.right ) { tiles.push( 'T1' ); }
+//	if( paths.top && paths.left && paths.bottom ) { tiles.push( 'T2' ); }
+//	if( paths.left && paths.top && paths.right ) { tiles.push( 'T3' ); }
+//	if( paths.top && paths.right && paths.bottom ) { tiles.push( 'T4' ); }
+
+	if( paths.top && paths.bottom && paths.left && paths.right ) { tiles.push( 'X' ); }
+	console.log(tiles);
+
+	/* First-card Force */
+	if( drawList.length == 1 ) { tiles = ['X']; }
+
+	/* Assign random tile from list */
+	var randInt = Math.floor( Math.random() * tiles.length);
+
+	var div = document.getElementById( 'tile_' + id );
+	div.classList.add( 'tile-' + tiles[randInt] );
+	div.classList.replace('tile-blank', 'tile');
+}
+function CreateDungeonGrid() {
 	var tileCount = 1;
 	dungeon.innerHTML = '';
 
-	startingCoordinates = [startCol, startRow];
-	tileWidth = Math.floor(dungeon.offsetWidth / gridWidth ) +'px'; 
+	var tileWidth = Math.floor(dungeon.offsetWidth / gridWidth ) +'px'; 
 
 	for(var x = 1; x <= gridHeight; x++) {
 		for(var y = 1; y <= gridWidth; y++) {
@@ -41,199 +87,126 @@ function CreateDungeon() {
 		}
 	}
 }
-function DetermineNeighborPaths(coordinates) {
+function GetNeighborArray( id ) {
+	var edgePaths = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
+
+	var coordinates = GetCoordinatesFromId( id );
+	/* Force us to stay on the grid */
+	if( coordinates[0] != 1 ) { edgePaths.left = GetTileIdFromCoordinates( [ coordinates[0] - 1, coordinates[1] ] ); }
+	if( coordinates[0] != gridWidth ) { edgePaths.right = GetTileIdFromCoordinates( [ coordinates[0] + 1, coordinates[1] ] ); }
+	if( coordinates[1] != 1 ) { edgePaths.top = GetTileIdFromCoordinates( [ coordinates[0], coordinates[1] - 1 ] ); }
+	if( coordinates[1] != gridHeight ) { edgePaths.bottom = GetTileIdFromCoordinates( [ coordinates[0], coordinates[1] + 1 ] ); }
+
+	
+	/* Check for tile assignments */
+	var tilesetPaths = GetNeighborByTileset( id );
+	
 	var neighbors = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
-
-	if( coordinates[0] != 1 ) { neighbors.left = true; }
-	if( coordinates[0] != gridWidth ) { neighbors.right = true; }
-	if( coordinates[1] != 1 ) { neighbors.top = true; }
-	if( coordinates[1] != gridHeight ) { neighbors.bottom = true; }
-
+	if( edgePaths.left && tilesetPaths.left ) { neighbors.left = edgePaths.left; }
+	if( edgePaths.right && tilesetPaths.right ) { neighbors.right = edgePaths.right; }
+	if( edgePaths.top && tilesetPaths.top ) { neighbors.top = edgePaths.top; }
+	if( edgePaths.bottom && tilesetPaths.bottom ) { neighbors.bottom = edgePaths.bottom; }
+	
 	return neighbors;
 }
-function DeterminePathsFromCoordinates( coordinates ) {
+function GetNeighborByTileset( id ) {	
+	var coordinates = GetCoordinatesFromId ( id );
 	var queryString = '.col_'+coordinates[0]+'.row_'+coordinates[1];
 	var targetTile = document.querySelectorAll( queryString )[0];
-	var paths = '';
+	var tilesetPaths = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
 
 	for( var c in targetTile.classList ) {
 		if( c >= 0 ) {
 			switch ( targetTile.classList[c] ) {
+				case 'tile-blank' :
+					tilesetPaths = { 'left' : true, 'top' : true, 'right' : true, 'bottom' : true };
+					break;
 				case 'tile-X' :
-					paths = { 'left' : true, 'top' : true, 'right' : true, 'bottom' : true };
+					tilesetPaths = { 'left' : true, 'top' : true, 'right' : true, 'bottom' : true };
 					break;
 				case 'tile-T1' : 
-					paths = { 'left' : true, 'top' : false, 'right' : true, 'bottom' : true };
+					tilesetPaths = { 'left' : true, 'top' : false, 'right' : true, 'bottom' : true };
 					break;
 				case 'tile-T2' : 
-					paths = { 'left' : true, 'top' : true, 'right' : false, 'bottom' : true };
+					tilesetPaths = { 'left' : true, 'top' : true, 'right' : false, 'bottom' : true };
 					break;
 				case 'tile-T3' : 
-					paths = { 'left' : true, 'top' : true, 'right' : true, 'bottom' : false };
+					tilesetPaths = { 'left' : true, 'top' : true, 'right' : true, 'bottom' : false };
 					break;
 				case 'tile-T4' : 
-					paths = { 'left' : false, 'top' : true, 'right' : true, 'bottom' : true };
+					tilesetPaths = { 'left' : false, 'top' : true, 'right' : true, 'bottom' : true };
 					break;
 				case 'tile-hallway1' : 
-					paths = { 'left' : true, 'top' : false, 'right' : true, 'bottom' : false };
+					tilesetPaths = { 'left' : true, 'top' : false, 'right' : true, 'bottom' : false };
 					break;
 				case 'tile-hallway2' : 
-					paths = { 'left' : false, 'top' : true, 'right' : false, 'bottom' : true };
+					tilesetPaths = { 'left' : false, 'top' : true, 'right' : false, 'bottom' : true };
 					break;
 				case 'tile-cap1' : 
-					paths = { 'left' : true, 'top' : false, 'right' : false, 'bottom' : false };
+					tilesetPaths = { 'left' : true, 'top' : false, 'right' : false, 'bottom' : false };
 					break;
 				case 'tile-cap2' : 
-					paths = { 'left' : false, 'top' : true, 'right' : false, 'bottom' : false };
+					tilesetPaths = { 'left' : false, 'top' : true, 'right' : false, 'bottom' : false };
 					break;
 				case 'tile-cap3' : 
-					paths = { 'left' : false, 'top' : false, 'right' : true, 'bottom' : false };
+					tilesetPaths = { 'left' : false, 'top' : false, 'right' : true, 'bottom' : false };
 					break;
 				case 'tile-cap4' : 
-					paths = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : true };
+					tilesetPaths = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : true };
 					break;
 			}
 		}
 	}
-
-	return paths;
+	
+	if( tilesetPaths.left ) { tilesetPaths.left = ( GetTileIdFromCoordinates( [ coordinates[0] - 1, coordinates[1] ] ) ); }
+	if( tilesetPaths.right ) { tilesetPaths.right = ( GetTileIdFromCoordinates( [ coordinates[0] + 1, coordinates[1] ] ) ); }
+	if( tilesetPaths.top ) { tilesetPaths.top = ( GetTileIdFromCoordinates( [ coordinates[0], coordinates[1] - 1 ] ) ); }
+	if( tilesetPaths.bottom ) { tilesetPaths.bottom = ( GetTileIdFromCoordinates( [ coordinates[0], coordinates[1] + 1 ] ) ); }
+	
+	return tilesetPaths;
 }
-function DrawDungeon() {
-	startCol = document.getElementById('dungeon_startingCol').value;
-	startRow = document.getElementById('dungeon_startingRow').value;
-	gridWidth = document.getElementById('dungeon_width').value;
-	gridHeight = document.getElementById('dungeon_height').value;
+function ResetDungeon() {
+	startCol = parseInt( document.getElementById('dungeon_startingCol').value );
+	startRow = parseInt( document.getElementById('dungeon_startingRow').value );
+	gridWidth = parseInt( document.getElementById('dungeon_width').value );
+	gridHeight = parseInt( document.getElementById('dungeon_height').value );
 
+	/* Force startCol/Row to stay on the grid. */
 	if( Number(startCol) > Number(gridWidth) ) { startCol = gridWidth; document.getElementById('dungeon_startingCol').value = startCol; }
 	if( Number(startRow) > Number(gridHeight) ) { startRow = gridHeight; document.getElementById('dungeon_startingRow').value = startRow; }
 
+	CreateDungeonGrid();
 
-	CreateDungeon();
 
-	var drawList = [];
-	var referenceList = [];
-	drawList.push( startingCoordinates );
-	referenceList.push( startingCoordinates );
-
-	var limit = document.getElementById( 'tool_limit' ).value;
-	for( var x = 0; x < limit; x++ ) {
+	drawList = [ GetTileIdFromCoordinates( [ startRow, startCol ] ) ];
+	DrawDungeon();
+}
+function DrawDungeon() {
+	var drawLimit = document.getElementById( 'tool_limit' ).value;
+	for( var x = 0; x < drawLimit; x++ ) {		
 		if( drawList[x] ) {
-//									console.log("x - " +x);
-			var div = DrawTile( drawList[x], referenceList[x] );
-
-//									console.log(drawList[x]);
-//									console.log( JSON.stringify(drawList) );
-
-			var paths = DeterminePathsFromCoordinates( drawList[x] );
-			if( paths.left ) {
-				var col = drawList[x][0];
-				var row = drawList[x][1];
-				col--;
-				if( col == 0 ) { col = 1; }
-
-				var thisDiv = GetTileFromCoordinates([col, row]);
-				if( thisDiv.classList.contains('tile-blank')) { 
-					drawList.push( [col, row] );
-					referenceList.push( drawList[x] );
-				}
-			}
-			if( paths.right ) {
-				var col = drawList[x][0];
-				var row = drawList[x][1];
-				col++;
-				if( col > gridWidth ) { col = gridWidth; }
-
-				var thisDiv = GetTileFromCoordinates([col, row]);
-				if( thisDiv.classList.contains('tile-blank')) { 
-					drawList.push( [col, row] );
-					referenceList.push( drawList[x] );
-				}
-
-			}
-			if( paths.top ) {
-				var col = drawList[x][0];
-				var row = drawList[x][1];
-				row--;
-				if( row == 0 ) { row = 1; }
-
-				var thisDiv = GetTileFromCoordinates([col, row]);
-				if( thisDiv.classList.contains('tile-blank')) { 
-					drawList.push( [col, row] );
-					referenceList.push( drawList[x] );
-				}
-			}
-			if( paths.bottom ) {
-				var col = drawList[x][0];
-				var row = drawList[x][1];
-				row++;
-				if( row > gridHeight ) { row = gridHeight; }		
-
-				var thisDiv = GetTileFromCoordinates([col, row]);
-				if( thisDiv.classList.contains('tile-blank')) { 
-					drawList.push( [col, row] );
-					referenceList.push( drawList[x] );
-				}
-			}
+//			console.log('DRAWLIST', x);
+			
+			AssignTile( drawList[x] );
+			DrawList_AddNeighbors( drawList[x] );
 		}
 	}
-
 }
-function DrawTile( coordinates, referenceCoordinates ) {
-	var queryString = '.col_x.row_y'.replace('x', coordinates[0]).replace('y', coordinates[1]);
-	var div = document.querySelectorAll( queryString )[0];
-
-	var tiles = ['X', 'T1', 'T2', 'T3', 'T4', 'hallway1', 'hallway2', 'hallway1', 'hallway2',  'hallway1', 'hallway2', 'hallway1', 'hallway2',  'hallway1', 'hallway2', 'hallway1', 'hallway2', 'cap1', 'cap2', 'cap3',  'cap4', 'cap1', 'cap2', 'cap3',  'cap4'];
-	if( coordinates == startingCoordinates ) {
-		div.classList.add( 'tile-X' );
-		console.log('(force X)');
-	} else {
-		console.log( coordinates, referenceCoordinates );
-//								console.log( referenceCoordinates );
-//								console.log( row - 1 );
-
-		if( coordinates[0] + 1 == referenceCoordinates[0] ) {
-			/* Border is to the right */
-			tiles = ['X', 'T1', 'T3', 'T4', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'cap3', 'cap3'];
-			console.log('a');
-		} else if( coordinates[0] - 1 == referenceCoordinates[0] ) {
-			/* Border is to the left */
-			tiles = ['X', 'T1', 'T2', 'T3', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'cap1', 'cap1'];
-			console.log('b');
-		} else if( coordinates[1] + 1 == referenceCoordinates[1] ) {
-			/* Border is to the bottom */
-			tiles = ['X', 'T1', 'T2', 'T4', 'hallway2', 'hallway2', 'hallway2', 'hallway2', 'hallway2', 'hallway2', 'cap4', 'cap4'];
-			console.log('c');
-		} else if( coordinates[1] - 1 == referenceCoordinates[1] ) {
-			/* Border is to the top */
-			tiles = ['X', 'T2', 'T3', 'T4', 'hallway2',  'hallway2',  'hallway2',  'hallway2',  'hallway2',  'hallway2',  'cap2',  'cap2'];
-			console.log('d');
-		} else { console.log('else'); }
-
-		randInt = Math.floor( Math.random() * tiles.length);
-//								console.log( JSON.stringify(coordinates) );
-//								console.log( JSON.stringify(referenceCoordinates) );
-//								console.log( tiles );
-		div.classList.add( 'tile-' + tiles[randInt] );
-	}
-	div.classList.replace('tile-blank', 'tile');
-
-	return div;
-}
-function GetTileCoordinates( tile ) {
-	var tile = document.getElementById( tile );
+function GetCoordinatesFromId( id ) {
+	var tile = document.getElementById( 'tile_'+id );
 	var x = 0;
 	var y = 0;
 
-	for( var c in tile.classList ) {
-		if( tile.classList[c].contains('col') ) {
+	for( var c = 0; c < tile.classList.length; c++ ) {
+		if( tile.classList[c].includes('col') ) {
 			x = tile.classList[c].replace('col_', '');
 		}
-		if( tile.classList[c].contains('row') ) {
+		if( tile.classList[c] && tile.classList[c].includes('row') ) {
 			y = tile.classList[c].replace('row_', '');
 		}
 	}
-
-	return [x, y];
+	
+	return [ parseInt(x),  parseInt(y) ];
 }
 function GetTileFromCoordinates( coordinates ) {
 	var queryString = '.col_'+coordinates[0]+'.row_'+coordinates[1];
@@ -241,5 +214,24 @@ function GetTileFromCoordinates( coordinates ) {
 
 	return targetTile;
 }
+function GetTileIdFromCoordinates( coordinates ) {
+	var targetTileId = false;
+	
+	if( ValidateCoordinates( coordinates ) ) {
+		var queryString = '.col_'+coordinates[0]+'.row_'+coordinates[1];
+		targetTileId = document.querySelectorAll( queryString )[0].id.replace('tile_','');
+	}
+	
+	return targetTileId;
+}
+function ValidateCoordinates( coordinates ) {
+	var status = false;
+	
+	if( coordinates[0] >= 1 && coordinates[0] <= gridWidth) {
+		if( coordinates[1] >= 1 && coordinates[1] <= gridHeight) { status = true; }
+	}
+	
+	return status;
+}
 
-DrawDungeon();
+ResetDungeon();
