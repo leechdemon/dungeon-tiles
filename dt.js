@@ -292,7 +292,7 @@ function DrawDungeon() {
 			if( GetTileFromCoordinates( GetCoordinatesFromId( drawList[x] ) ).classList.contains('tile-blank') ) {
 				AssignTile( drawList[x] );
 				
-				displayTileLabels = true;
+				displayTileLabels = false;
 				if( displayTileLabels ) {
 					GetTileFromCoordinates( GetCoordinatesFromId( drawList[x] ) ).innerHTML = '<div>' +x+'</div><div style="clear: both;">Tile_'+drawList[x]+'</div>';
 				}

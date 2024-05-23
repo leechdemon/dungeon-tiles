@@ -33,17 +33,17 @@
 	<p style="float: right;">v<?php echo $version; ?></p>
 	<button onclick="javascript:ResetDungeon();">Reset Dungeon</button>
 	<hr>
-	<input type="number" id="tool_limit" value="25">
+	<input type="number" id="tool_limit" value="100">
 	<label for="tool_limit">Limit</label>
 	<hr>
-	<input type="number" id="dungeon_width" value="15">
+	<input type="number" id="dungeon_width" value="30">
 	<label for="dungeon_width">Width</label>
-	<input type="number" id="dungeon_height" value="15">
+	<input type="number" id="dungeon_height" value="30">
 	<label for="dungeon_height">Height</label>
 	<hr>
-	<input type="number" id="dungeon_startingCol" value="5">
+	<input type="number" id="dungeon_startingCol" value="15">
 	<label for="dungeon_startingCol">Starting Col</label>
-	<input type="number" id="dungeon_startingRow" value="5">
+	<input type="number" id="dungeon_startingRow" value="15">
 	<label for="dungeon_startingRow">Starting Row</label>
 
 </div>
