@@ -31,7 +31,8 @@
 <div id="dungeon"></div>
 <div id="tools">
 	<p style="float: right;">v<?php echo $version; ?></p>
-	<button onclick="javascript:ResetDungeon();">Reset Dungeon</button>
+  <button onclick="javascript:ResetDungeon();">Reset Dungeon</button>
+  
 	<hr>
 	<input type="number" id="tool_limit" value="100">
 	<label for="tool_limit">Limit</label>
@@ -47,6 +48,5 @@
 	<label for="dungeon_startingRow">Starting Row</label>
 
 </div>
-
 
 <script type="text/javascript" src="<?php echo get_stylesheet_directory_uri(); ?>/dungeon-tiles/dt.js?v=<?php echo random_int(0,99999); ?>"></script>
