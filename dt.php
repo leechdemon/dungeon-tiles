@@ -1,11 +1,11 @@
-<?php $version = 0.2; ?>
+<?php $version = "0.2.2"; ?>
 
 <style>
 	#dungeon { width: 75%; }
 	#tools { width: 25%; }
 	#tools button, #tools input { margin: 1rem; max-width: 50%; }
 
-	.tile, .tile-blank { width: 15px; height: 15px; float: left; text-align: center; background-size: contain; background-color: #2d303d; /* opacity: 0; transition-duration: 0.25s; */ padding: 0px; }
+	.tile, .tile-blank { color: white; font-size: small; width: 15px; height: 15px; float: left; text-align: center; background-size: contain; background-color: #2d303d; /* opacity: 0; transition-duration: 0.25s; */ padding: 0px; }
 	@media screen and (max-width: 500px) {
 		.tile { width: 25px; height: 25px; }
 	}
@@ -33,17 +33,17 @@
 	<p style="float: right;">v<?php echo $version; ?></p>
 	<button onclick="javascript:ResetDungeon();">Reset Dungeon</button>
 	<hr>
-	<input type="number" id="tool_limit" value="5">
+	<input type="number" id="tool_limit" value="25">
 	<label for="tool_limit">Limit</label>
 	<hr>
-	<input type="number" id="dungeon_width" value="10">
+	<input type="number" id="dungeon_width" value="15">
 	<label for="dungeon_width">Width</label>
-	<input type="number" id="dungeon_height" value="10">
+	<input type="number" id="dungeon_height" value="15">
 	<label for="dungeon_height">Height</label>
 	<hr>
-	<input type="number" id="dungeon_startingCol" value="2">
+	<input type="number" id="dungeon_startingCol" value="5">
 	<label for="dungeon_startingCol">Starting Col</label>
-	<input type="number" id="dungeon_startingRow" value="2">
+	<input type="number" id="dungeon_startingRow" value="5">
 	<label for="dungeon_startingRow">Starting Row</label>
 
 </div>
