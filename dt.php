@@ -1,6 +1,4 @@
-<?php 
-
-?>
+<?php $version = 0.2; ?>
 
 <style>
 	#dungeon { width: 75%; }
@@ -32,6 +30,7 @@
 
 <div id="dungeon"></div>
 <div id="tools">
+	<p style="float: right;">v<?php echo $version; ?></p>
 	<button onclick="javascript:ResetDungeon();">Reset Dungeon</button>
 	<hr>
 	<input type="number" id="tool_limit" value="5">
