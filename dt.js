@@ -4,25 +4,163 @@ var gridHeight = 0;
 
 var startCol = 0;
 var startRow = 0;
-var startingCoordinates = [0, 0];
-var tileWidth = 0;
+var drawList = [];
 
-function BuildTileList(id, neighbors) {
-	var tiles = [];
 
-//							for( n in neighbors ) {
-//								if( neighbors[n] ) {
-			var tileId = id - 1; 
-			var paths = DetermineTileWalls( id );
-//								}
-//							}
+function DrawList_AddNeighbors( id  ) {
+	var paths = GetNeighborByTileset( id );
+	
+	if( paths.left ) { drawList.push( paths.left ); }
+	if( paths.right ) { drawList.push( paths.right ); }
+	if( paths.top ) { drawList.push( paths.top); }
+	if( paths.bottom ) { drawList.push( paths.bottom ); }
 }
-function CreateDungeon() {
+function AssignTile( id ) {
+	var tiles = { 'X' : false, 'T1' : false, 'T2' : false, 'T3' : false, 'T4' : false, 'hallway1' : false, 'hallway2' : false, 'cap1' : false, 'cap2' : false, 'cap3' : false, 'cap4' : false };
+	var paths = GetNeighborArray( id );
+	var neighborTilesetArray = GetNeighborTilesetArray( paths );
+	
+	/* First-card Force */
+	if( drawList.length == 1 ) {
+		tiles.X = true;
+	}
+	else {
+		/* Add to array based on current paths */
+//		if( paths.top && paths.bottom && paths.left && paths.right ) { tiles.X = true; }
+//		
+//		if( paths.right && paths.bottom && paths.left) { tiles.T1 = true; }
+//		if( paths.bottom && paths.left && paths.top ) { tiles.T2 = true; }
+//		if( paths.left && paths.top && paths.right ) { tiles.T3 = true; }
+//		if( paths.top && paths.right && paths.bottom ) { tiles.T4 = true; }
+////		
+//		if( paths.left && paths.right) {
+////			console.log('hallway1');
+////			if( !paths.top.bottom && !paths.bottom.top ) {
+//				tiles.hallway1 = true;
+////			}
+//		}
+//		if( paths.top && paths.bottom) {
+////			console.log('hallway2');
+////			if( !paths.left.right && !paths.right.left ) {
+//				tiles.hallway2 = true;
+////			}
+//		}
+//		
+		console.log( 'neighborTilesetArray ('+id+')', neighborTilesetArray );
+
+		if( neighborTilesetArray.left.right == id ) {
+			if( !neighborTilesetArray.top.bottom && !neighborTilesetArray.right.left && !neighborTilesetArray.bottom.top ) {
+				tiles.cap1 = true;
+			}
+
+			if( neighborTilesetArray.right ) {
+				if ( neighborTilesetArray.right.left == 'blank' || !neighborTilesetArray.right.left ) {
+					if( !neighborTilesetArray.bottom.top && !neighborTilesetArray.top.bottom ) {
+						tiles.hallway1 = true;
+					}
+
+					if (neighborTilesetArray.top == 'blank' || !neighborTilesetArray.top.bottom ) {
+						tiles.T1 = true;
+					} else if (neighborTilesetArray.bottom == 'blank' || !neighborTilesetArray.bottom.top ) {
+						tiles.T3 = true;
+					}
+				}
+			}
+		}
+		if( neighborTilesetArray.top.bottom == id ) {
+			if( !neighborTilesetArray.right.left && !neighborTilesetArray.bottom.top && !neighborTilesetArray.left.right ) {
+				tiles.cap2 = true;
+			}
+
+			if( neighborTilesetArray.bottom ) {
+				if ( neighborTilesetArray.bottom.top == 'blank' || !neighborTilesetArray.bottom.top ) {
+					if( !neighborTilesetArray.left.right && !neighborTilesetArray.right.left ) {
+						tiles.hallway2 = true;
+					}
+
+					if (neighborTilesetArray.right == 'blank' || !neighborTilesetArray.right.left ) {
+						tiles.T4 = true;
+					} else if (neighborTilesetArray.left == 'blank' || !neighborTilesetArray.left.right ) {
+						tiles.T2 = true;
+					}
+				}
+			}
+		}
+		if( neighborTilesetArray.right.left == id ) {
+			if( !neighborTilesetArray.bottom.top && !neighborTilesetArray.left.right && !neighborTilesetArray.top.bottom ) {
+				tiles.cap3 = true;
+			}
+
+			if( neighborTilesetArray.left ) {
+				if ( neighborTilesetArray.left.right == 'blank' || !neighborTilesetArray.left.right ) {
+					if( !neighborTilesetArray.top.bottom && !neighborTilesetArray.bottom.top ) {
+						tiles.hallway1 = true;
+					}
+
+					if ( neighborTilesetArray.bottom == 'blank' || !neighborTilesetArray.bottom.top ) {
+						tiles.T3 = true;
+					} else if ( neighborTilesetArray.top == 'blank' || !neighborTilesetArray.top.bottom ) {
+						tiles.T1 = true;
+					}
+				}
+			}
+		}
+		if( neighborTilesetArray.bottom.top == id ) {
+			if( !neighborTilesetArray.left.right && !neighborTilesetArray.right.left && !neighborTilesetArray.bottom.top ) {
+				tiles.cap4 = true;
+			}
+
+			if( neighborTilesetArray.top ) {
+				if ( neighborTilesetArray.top.bottom == 'blank' || !neighborTilesetArray.top.bottom ) {
+					if( !neighborTilesetArray.right.left && !neighborTilesetArray.left.right ) {
+						tiles.hallway2 = true;
+					}
+
+					if (neighborTilesetArray.left == 'blank' || !neighborTilesetArray.left.right ) {
+						tiles.T2 = true;
+					} else if (neighborTilesetArray.right == 'blank' || !neighborTilesetArray.right.left ) {
+						tiles.T4 = true;
+					}
+				}
+			}
+		}
+		if( neighborTilesetArray.left && neighborTilesetArray.top && neighborTilesetArray.right && neighborTilesetArray.bottom ) {
+			if( ( neighborTilesetArray.left.right == 'blank' || !neighborTilesetArray.left.right ) &&
+				( neighborTilesetArray.top.bottom == 'blank' || !neighborTilesetArray.top.bottom ) &&
+				( neighborTilesetArray.right.left == 'blank' || !neighborTilesetArray.right.left ) &&
+				( neighborTilesetArray.bottom.top == 'blank' || !neighborTilesetArray.bottom.top ) ) {
+			   tiles.X = true;
+			}
+		}
+		
+	
+		
+//		/* Remove from array based on neighbor tiles */
+//		if( !neighborTilesetArray.left.right ) {
+//			tiles.X = false;
+//			
+//			
+//		}
+	}
+
+//	console.log('tiles ('+id+')', tiles);		
+	for(var key in tiles) { if(!tiles[key]) delete tiles[key]; }
+	console.log('tiles ('+id+')', tiles);		
+
+	/* Assign random tile from list */
+	var div = document.getElementById( 'tile_' + id );
+	const randomObjectValue = tiles => Object.keys(tiles)[(Math.random() * Object.keys(tiles).length) | 0];
+	var randomProp = randomObjectValue( tiles );
+	
+	div.classList.add( 'tile-' + randomProp );
+	div.classList.replace('tile-blank', 'tile');
+//	console.log('tiles ('+id+')', tiles);		
+}
+function CreateDungeonGrid() {
 	var tileCount = 1;
 	dungeon.innerHTML = '';
 
-	startingCoordinates = [startCol, startRow];
-	tileWidth = Math.floor(dungeon.offsetWidth / gridWidth ) +'px'; 
+	var tileWidth = Math.floor(dungeon.offsetWidth / gridWidth ) +'px'; 
 
 	for(var x = 1; x <= gridHeight; x++) {
 		for(var y = 1; y <= gridWidth; y++) {
@@ -41,199 +179,143 @@ function CreateDungeon() {
 		}
 	}
 }
-function DetermineNeighborPaths(coordinates) {
+function GetNeighborArray( id ) {
+	var edgePaths = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
+
+	var coordinates = GetCoordinatesFromId( id );
+	/* Force us to stay on the grid */
+	if( coordinates[0] != 1 ) { edgePaths.left = GetTileIdFromCoordinates( [ coordinates[0] - 1, coordinates[1] ] ); }
+	if( coordinates[0] != gridWidth ) { edgePaths.right = GetTileIdFromCoordinates( [ coordinates[0] + 1, coordinates[1] ] ); }
+	if( coordinates[1] != 1 ) { edgePaths.top = GetTileIdFromCoordinates( [ coordinates[0], coordinates[1] - 1 ] ); }
+	if( coordinates[1] != gridHeight ) { edgePaths.bottom = GetTileIdFromCoordinates( [ coordinates[0], coordinates[1] + 1 ] ); }
+
+	
+	/* Check for tile assignments */
+	var tilesetPaths = GetNeighborByTileset( id );
+	
 	var neighbors = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
-
-	if( coordinates[0] != 1 ) { neighbors.left = true; }
-	if( coordinates[0] != gridWidth ) { neighbors.right = true; }
-	if( coordinates[1] != 1 ) { neighbors.top = true; }
-	if( coordinates[1] != gridHeight ) { neighbors.bottom = true; }
-
+	if( edgePaths.left && tilesetPaths.left ) { neighbors.left = edgePaths.left; }
+	if( edgePaths.right && tilesetPaths.right ) { neighbors.right = edgePaths.right; }
+	if( edgePaths.top && tilesetPaths.top ) { neighbors.top = edgePaths.top; }
+	if( edgePaths.bottom && tilesetPaths.bottom ) { neighbors.bottom = edgePaths.bottom; }
+	
 	return neighbors;
 }
-function DeterminePathsFromCoordinates( coordinates ) {
+function GetNeighborByTileset( id ) {	
+	var coordinates = GetCoordinatesFromId ( id );
 	var queryString = '.col_'+coordinates[0]+'.row_'+coordinates[1];
 	var targetTile = document.querySelectorAll( queryString )[0];
-	var paths = '';
+	var tilesetPaths = { 'blank': false, 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
 
 	for( var c in targetTile.classList ) {
 		if( c >= 0 ) {
 			switch ( targetTile.classList[c] ) {
+				case 'tile-blank' :
+					tilesetPaths = { 'blank': true, 'left' : true, 'top' : true, 'right' : true, 'bottom' : true };
+					break;
 				case 'tile-X' :
-					paths = { 'left' : true, 'top' : true, 'right' : true, 'bottom' : true };
+					tilesetPaths = { 'blank' : false, 'left' : true, 'top' : true, 'right' : true, 'bottom' : true };
 					break;
 				case 'tile-T1' : 
-					paths = { 'left' : true, 'top' : false, 'right' : true, 'bottom' : true };
+					tilesetPaths = { 'blank' : false, 'left' : true, 'top' : false, 'right' : true, 'bottom' : true };
 					break;
 				case 'tile-T2' : 
-					paths = { 'left' : true, 'top' : true, 'right' : false, 'bottom' : true };
+					tilesetPaths = { 'blank' : false, 'left' : true, 'top' : true, 'right' : false, 'bottom' : true };
 					break;
 				case 'tile-T3' : 
-					paths = { 'left' : true, 'top' : true, 'right' : true, 'bottom' : false };
+					tilesetPaths = { 'blank' : false, 'left' : true, 'top' : true, 'right' : true, 'bottom' : false };
 					break;
 				case 'tile-T4' : 
-					paths = { 'left' : false, 'top' : true, 'right' : true, 'bottom' : true };
+					tilesetPaths = { 'blank' : false, 'left' : false, 'top' : true, 'right' : true, 'bottom' : true };
 					break;
 				case 'tile-hallway1' : 
-					paths = { 'left' : true, 'top' : false, 'right' : true, 'bottom' : false };
+					tilesetPaths = { 'blank' : false, 'left' : true, 'top' : false, 'right' : true, 'bottom' : false };
 					break;
 				case 'tile-hallway2' : 
-					paths = { 'left' : false, 'top' : true, 'right' : false, 'bottom' : true };
+					tilesetPaths = { 'blank' : false, 'left' : false, 'top' : true, 'right' : false, 'bottom' : true };
 					break;
 				case 'tile-cap1' : 
-					paths = { 'left' : true, 'top' : false, 'right' : false, 'bottom' : false };
+					tilesetPaths = { 'blank' : false, 'left' : true, 'top' : false, 'right' : false, 'bottom' : false };
 					break;
 				case 'tile-cap2' : 
-					paths = { 'left' : false, 'top' : true, 'right' : false, 'bottom' : false };
+					tilesetPaths = { 'blank' : false, 'left' : false, 'top' : true, 'right' : false, 'bottom' : false };
 					break;
 				case 'tile-cap3' : 
-					paths = { 'left' : false, 'top' : false, 'right' : true, 'bottom' : false };
+					tilesetPaths = { 'blank' : false, 'left' : false, 'top' : false, 'right' : true, 'bottom' : false };
 					break;
 				case 'tile-cap4' : 
-					paths = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : true };
+					tilesetPaths = { 'blank' : false, 'left' : false, 'top' : false, 'right' : false, 'bottom' : true };
 					break;
 			}
 		}
 	}
-
-	return paths;
+	
+	if( tilesetPaths.left ) { tilesetPaths.left = ( GetTileIdFromCoordinates( [ coordinates[0] - 1, coordinates[1] ] ) ); }
+	if( tilesetPaths.right ) { tilesetPaths.right = ( GetTileIdFromCoordinates( [ coordinates[0] + 1, coordinates[1] ] ) ); }
+	if( tilesetPaths.top ) { tilesetPaths.top = ( GetTileIdFromCoordinates( [ coordinates[0], coordinates[1] - 1 ] ) ); }
+	if( tilesetPaths.bottom ) { tilesetPaths.bottom = ( GetTileIdFromCoordinates( [ coordinates[0], coordinates[1] + 1 ] ) ); }
+	
+	return tilesetPaths;
 }
-function DrawDungeon() {
-	startCol = document.getElementById('dungeon_startingCol').value;
-	startRow = document.getElementById('dungeon_startingRow').value;
-	gridWidth = document.getElementById('dungeon_width').value;
-	gridHeight = document.getElementById('dungeon_height').value;
+function GetNeighborTilesetArray( paths ) {
+	var tilesetArray = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
+	for( var direction in paths ) {
+		if( paths[direction] ) {
+			tilesetArray[direction] = GetNeighborByTileset( paths[direction] );
+			if( tilesetArray[direction].blank ) { tilesetArray[direction] = 'blank'; }
+		}
+	}
+	return tilesetArray;
+}
+function ResetDungeon() {
+	startCol = parseInt( document.getElementById('dungeon_startingCol').value );
+	startRow = parseInt( document.getElementById('dungeon_startingRow').value );
+	gridWidth = parseInt( document.getElementById('dungeon_width').value );
+	gridHeight = parseInt( document.getElementById('dungeon_height').value );
 
+	/* Force startCol/Row to stay on the grid. */
 	if( Number(startCol) > Number(gridWidth) ) { startCol = gridWidth; document.getElementById('dungeon_startingCol').value = startCol; }
 	if( Number(startRow) > Number(gridHeight) ) { startRow = gridHeight; document.getElementById('dungeon_startingRow').value = startRow; }
 
+	CreateDungeonGrid();
 
-	CreateDungeon();
 
-	var drawList = [];
-	var referenceList = [];
-	drawList.push( startingCoordinates );
-	referenceList.push( startingCoordinates );
-
-	var limit = document.getElementById( 'tool_limit' ).value;
-	for( var x = 0; x < limit; x++ ) {
+	drawList = [ GetTileIdFromCoordinates( [ startRow, startCol ] ) ];
+	DrawDungeon();
+}
+function DrawDungeon() {
+	var drawLimit = document.getElementById( 'tool_limit' ).value;
+	for( var x = 0; x < drawLimit; x++ ) {		
 		if( drawList[x] ) {
-//									console.log("x - " +x);
-			var div = DrawTile( drawList[x], referenceList[x] );
-
-//									console.log(drawList[x]);
-//									console.log( JSON.stringify(drawList) );
-
-			var paths = DeterminePathsFromCoordinates( drawList[x] );
-			if( paths.left ) {
-				var col = drawList[x][0];
-				var row = drawList[x][1];
-				col--;
-				if( col == 0 ) { col = 1; }
-
-				var thisDiv = GetTileFromCoordinates([col, row]);
-				if( thisDiv.classList.contains('tile-blank')) { 
-					drawList.push( [col, row] );
-					referenceList.push( drawList[x] );
+//			console.log('DRAWLIST', x);
+			
+			if( GetTileFromCoordinates( GetCoordinatesFromId( drawList[x] ) ).classList.contains('tile-blank') ) {
+				AssignTile( drawList[x] );
+				
+				displayTileLabels = false;
+				if( displayTileLabels ) {
+					GetTileFromCoordinates( GetCoordinatesFromId( drawList[x] ) ).innerHTML = '<div>' +x+'</div><div style="clear: both;">Tile_'+drawList[x]+'</div>';
 				}
-			}
-			if( paths.right ) {
-				var col = drawList[x][0];
-				var row = drawList[x][1];
-				col++;
-				if( col > gridWidth ) { col = gridWidth; }
-
-				var thisDiv = GetTileFromCoordinates([col, row]);
-				if( thisDiv.classList.contains('tile-blank')) { 
-					drawList.push( [col, row] );
-					referenceList.push( drawList[x] );
-				}
-
-			}
-			if( paths.top ) {
-				var col = drawList[x][0];
-				var row = drawList[x][1];
-				row--;
-				if( row == 0 ) { row = 1; }
-
-				var thisDiv = GetTileFromCoordinates([col, row]);
-				if( thisDiv.classList.contains('tile-blank')) { 
-					drawList.push( [col, row] );
-					referenceList.push( drawList[x] );
-				}
-			}
-			if( paths.bottom ) {
-				var col = drawList[x][0];
-				var row = drawList[x][1];
-				row++;
-				if( row > gridHeight ) { row = gridHeight; }		
-
-				var thisDiv = GetTileFromCoordinates([col, row]);
-				if( thisDiv.classList.contains('tile-blank')) { 
-					drawList.push( [col, row] );
-					referenceList.push( drawList[x] );
-				}
+				DrawList_AddNeighbors( drawList[x] );
 			}
 		}
 	}
-
 }
-function DrawTile( coordinates, referenceCoordinates ) {
-	var queryString = '.col_x.row_y'.replace('x', coordinates[0]).replace('y', coordinates[1]);
-	var div = document.querySelectorAll( queryString )[0];
-
-	var tiles = ['X', 'T1', 'T2', 'T3', 'T4', 'hallway1', 'hallway2', 'hallway1', 'hallway2',  'hallway1', 'hallway2', 'hallway1', 'hallway2',  'hallway1', 'hallway2', 'hallway1', 'hallway2', 'cap1', 'cap2', 'cap3',  'cap4', 'cap1', 'cap2', 'cap3',  'cap4'];
-	if( coordinates == startingCoordinates ) {
-		div.classList.add( 'tile-X' );
-		console.log('(force X)');
-	} else {
-		console.log( coordinates, referenceCoordinates );
-//								console.log( referenceCoordinates );
-//								console.log( row - 1 );
-
-		if( coordinates[0] + 1 == referenceCoordinates[0] ) {
-			/* Border is to the right */
-			tiles = ['X', 'T1', 'T3', 'T4', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'cap3', 'cap3'];
-			console.log('a');
-		} else if( coordinates[0] - 1 == referenceCoordinates[0] ) {
-			/* Border is to the left */
-			tiles = ['X', 'T1', 'T2', 'T3', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'hallway1', 'cap1', 'cap1'];
-			console.log('b');
-		} else if( coordinates[1] + 1 == referenceCoordinates[1] ) {
-			/* Border is to the bottom */
-			tiles = ['X', 'T1', 'T2', 'T4', 'hallway2', 'hallway2', 'hallway2', 'hallway2', 'hallway2', 'hallway2', 'cap4', 'cap4'];
-			console.log('c');
-		} else if( coordinates[1] - 1 == referenceCoordinates[1] ) {
-			/* Border is to the top */
-			tiles = ['X', 'T2', 'T3', 'T4', 'hallway2',  'hallway2',  'hallway2',  'hallway2',  'hallway2',  'hallway2',  'cap2',  'cap2'];
-			console.log('d');
-		} else { console.log('else'); }
-
-		randInt = Math.floor( Math.random() * tiles.length);
-//								console.log( JSON.stringify(coordinates) );
-//								console.log( JSON.stringify(referenceCoordinates) );
-//								console.log( tiles );
-		div.classList.add( 'tile-' + tiles[randInt] );
-	}
-	div.classList.replace('tile-blank', 'tile');
-
-	return div;
-}
-function GetTileCoordinates( tile ) {
-	var tile = document.getElementById( tile );
+function GetCoordinatesFromId( id ) {
+	var tile = document.getElementById( 'tile_'+id );
 	var x = 0;
 	var y = 0;
 
-	for( var c in tile.classList ) {
-		if( tile.classList[c].contains('col') ) {
+	for( var c = 0; c < tile.classList.length; c++ ) {
+		if( tile.classList[c].includes('col') ) {
 			x = tile.classList[c].replace('col_', '');
 		}
-		if( tile.classList[c].contains('row') ) {
+		if( tile.classList[c] && tile.classList[c].includes('row') ) {
 			y = tile.classList[c].replace('row_', '');
 		}
 	}
-
-	return [x, y];
+	
+	return [ parseInt(x),  parseInt(y) ];
 }
 function GetTileFromCoordinates( coordinates ) {
 	var queryString = '.col_'+coordinates[0]+'.row_'+coordinates[1];
@@ -241,5 +323,24 @@ function GetTileFromCoordinates( coordinates ) {
 
 	return targetTile;
 }
+function GetTileIdFromCoordinates( coordinates ) {
+	var targetTileId = false;
+	
+	if( ValidateCoordinates( coordinates ) ) {
+		var queryString = '.col_'+coordinates[0]+'.row_'+coordinates[1];
+		targetTileId = document.querySelectorAll( queryString )[0].id.replace('tile_','');
+	}
+	
+	return targetTileId;
+}
+function ValidateCoordinates( coordinates ) {
+	var status = false;
+	
+	if( coordinates[0] >= 1 && coordinates[0] <= gridWidth) {
+		if( coordinates[1] >= 1 && coordinates[1] <= gridHeight) { status = true; }
+	}
+	
+	return status;
+}
 
-DrawDungeon();
+ResetDungeon();
