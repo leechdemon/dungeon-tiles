@@ -4,13 +4,13 @@ const displayTileLabels = document.getElementById('displayTileLabels')
 displayTileLabels.addEventListener('change', (event) => {
 	var tileLabels = document.getElementsByClassName('tileLabel');
 	
-	if (event.currentTarget.checked) {
-		for(var x in tileLabels) {
-			tileLabels[x].style.display = 'flex';
-		}
-	} else {
-		for(var x in tileLabels) {
-			tileLabels[x].style.display = 'none';
+	for(var x in tileLabels) {
+		if( tileLabels[x].style ) {
+			if (event.currentTarget.checked) {
+				tileLabels[x].style.display = 'block';
+			} else {
+				tileLabels[x].style.display = 'none';
+			}
 		}
 	}
 })

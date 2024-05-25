@@ -9,6 +9,7 @@
 	@media screen and (max-width: 500px) {
 		.tile { width: 25px; height: 25px; }
 	}
+	.tileLabel { font-weight: 800; font-size: smaller; }
 
 	.tile-X { background-image: url("/wp-content/uploads/2024/05/tile-x.jpg"); }
 
