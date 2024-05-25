@@ -1,10 +1,32 @@
 const dungeon = document.getElementById('dungeon');
+
+const displayTileLabels = document.getElementById('displayTileLabels')
+displayTileLabels.addEventListener('change', (event) => {
+	var tileLabels = document.getElementsByClassName('tileLabel');
+	
+	if (event.currentTarget.checked) {
+		for(var x in tileLabels) {
+			tileLabels[x].style.display = 'flex';
+		}
+	} else {
+		for(var x in tileLabels) {
+			tileLabels[x].style.display = 'none';
+		}
+	}
+})
+
 var gridWidth = 0;
 var gridHeight = 0;
 
 var startCol = 0;
 var startRow = 0;
 var drawList = [];
+
+
+/* Jason */
+/* Instead of using a complicated "serial-if" argument... */
+	/* ...What if we combine the Neighbor arrays to create a single array for "Do I get to draw something here?" */
+	/* Then, each Tile Assignment is a single-dimensional array. */
 
 
 function DrawList_AddNeighbors( id  ) {
@@ -125,10 +147,11 @@ function AssignTile( id ) {
 			}
 		}
 		if( neighborTilesetArray.left && neighborTilesetArray.top && neighborTilesetArray.right && neighborTilesetArray.bottom ) {
-			if( ( neighborTilesetArray.left.right == 'blank' || !neighborTilesetArray.left.right ) &&
-				( neighborTilesetArray.top.bottom == 'blank' || !neighborTilesetArray.top.bottom ) &&
-				( neighborTilesetArray.right.left == 'blank' || !neighborTilesetArray.right.left ) &&
-				( neighborTilesetArray.bottom.top == 'blank' || !neighborTilesetArray.bottom.top ) ) {
+			console.log('maybe X...');
+			if( ( neighborTilesetArray.left == 'blank' || !neighborTilesetArray.left.right ) &&
+				( neighborTilesetArray.top == 'blank' || !neighborTilesetArray.top.bottom ) &&
+				( neighborTilesetArray.right == 'blank' || !neighborTilesetArray.right.left ) &&
+				( neighborTilesetArray.bottom == 'blank' || !neighborTilesetArray.bottom.top ) ) {
 			   tiles.X = true;
 			}
 		}
@@ -145,7 +168,7 @@ function AssignTile( id ) {
 
 //	console.log('tiles ('+id+')', tiles);		
 	for(var key in tiles) { if(!tiles[key]) delete tiles[key]; }
-	console.log('tiles ('+id+')', tiles);		
+//	console.log('tiles ('+id+')', tiles);		
 
 	/* Assign random tile from list */
 	var div = document.getElementById( 'tile_' + id );
@@ -283,6 +306,13 @@ function ResetDungeon() {
 	drawList = [ GetTileIdFromCoordinates( [ startRow, startCol ] ) ];
 	DrawDungeon();
 }
+function DisplayTileLabels( drawList_x, id ) {
+	var display = 'display: none; ';
+	if( displayTileLabels.checked ) { display = 'display: flex; '; }
+
+	var thisLabel = GetTileFromCoordinates( GetCoordinatesFromId( id ) );
+	thisLabel.innerHTML = '<div class="tileLabel" style="'+display+'"><div>' +drawList_x+'</div><div style="clear: both;">Tile_'+id+'</div></div>';
+}
 function DrawDungeon() {
 	var drawLimit = document.getElementById( 'tool_limit' ).value;
 	for( var x = 0; x < drawLimit; x++ ) {		
@@ -291,11 +321,8 @@ function DrawDungeon() {
 			
 			if( GetTileFromCoordinates( GetCoordinatesFromId( drawList[x] ) ).classList.contains('tile-blank') ) {
 				AssignTile( drawList[x] );
+				DisplayTileLabels( x, drawList[x] );
 				
-				displayTileLabels = false;
-				if( displayTileLabels ) {
-					GetTileFromCoordinates( GetCoordinatesFromId( drawList[x] ) ).innerHTML = '<div>' +x+'</div><div style="clear: both;">Tile_'+drawList[x]+'</div>';
-				}
 				DrawList_AddNeighbors( drawList[x] );
 			}
 		}
