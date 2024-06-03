@@ -173,8 +173,16 @@ function AssignTile( id ) {
 	/* Assign random tile from list */
 	var div = document.getElementById( 'tile_' + id );
 	const randomObjectValue = tiles => Object.keys(tiles)[(Math.random() * Object.keys(tiles).length) | 0];
-	var randomProp = randomObjectValue( tiles );
+	var randomProp = '';
 	
+	var hallwayLength = document.getElementById( 'hallwayLength' ).value;
+	for( var x = 0; x <= hallwayLength; x++ ) {
+		if( randomProp != 'hallway1' && randomProp != 'hallway2' ) {
+			randomProp = randomObjectValue( tiles );
+		} else {
+			break;
+		}
+	}
 	div.classList.add( 'tile-' + randomProp );
 	div.classList.replace('tile-blank', 'tile');
 //	console.log('tiles ('+id+')', tiles);		

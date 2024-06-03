@@ -1,9 +1,12 @@
-<?php $version = "0.2.2b"; ?>
+<?php $version = "0.2.2c"; ?>
 
 <style>
 	#dungeon { width: 75%; }
 	#tools { width: 25%; }
-	#tools button, #tools input { margin: 1rem; max-width: 50%; }
+	#tools button { margin: 1rem; max-width: 50%; }
+	#tools input { width: 100%; }
+	#tools .input-group { max-width: 100%; clear: both; margin: 1rem; }
+	#tools .input-item { max-width: 45%; text-align: center; margin: 0.25rem; float: left; }
 
 	.tile, .tile-blank { color: white; font-size: small; width: 15px; height: 15px; float: left; text-align: center; background-size: contain; background-color: #2d303d; /* opacity: 0; transition-duration: 0.25s; */ padding: 0px; }
 	@media screen and (max-width: 500px) {
@@ -33,25 +36,47 @@
 <div id="dungeon"></div>
 <div id="tools">
 	<p style="float: right;">v<?php echo $version; ?></p>
-  <button onclick="javascript:ResetDungeon();">Reset Dungeon</button>
+	<button onclick="javascript:ResetDungeon();">Reset Dungeon</button>
   
-	<hr>
-	<input type="number" id="tool_limit" value="75">
-	<label for="tool_limit">Limit</label>
-	<hr>
-	<input type="number" id="dungeon_width" value="15">
-	<label for="dungeon_width">Width</label>
-	<input type="number" id="dungeon_height" value="15">
-	<label for="dungeon_height">Height</label>
-	<hr>
-	<input type="number" id="dungeon_startingCol" value="6">
-	<label for="dungeon_startingCol">Starting Col</label>
-	<input type="number" id="dungeon_startingRow" value="6">
-	<label for="dungeon_startingRow">Starting Row</label>
+	<div class="input-group">
+		<div class="input-item">
+			<input type="number" id="tool_limit" value="75">
+			<label for="tool_limit">Limit</label>
+		</div>
+	</div>
+	<div class="input-group">
+		<div class="input-item">
+			<input type="number" id="dungeon_width" value="15">
+			<label for="dungeon_width">Width</label>
+		</div>
+		<div class="input-item">
+			<input type="number" id="dungeon_height" value="15">
+			<label for="dungeon_height">Height</label>
+		</div>
+	</div>
+	<div class="input-group">
+		<div class="input-item">
+			<input type="number" id="hallwayLength" value="2">
+			<label for="hallwayLength">Hallway Length</label>
+		</div>
+	</div>
+	<div class="input-group">
+		<div class="input-item">
+			<input type="number" id="dungeon_startingCol" value="6">
+			<label for="dungeon_startingCol">Starting Col</label>
+		</div>
+		<div class="input-item">
+			<input type="number" id="dungeon_startingRow" value="6">
+			<label for="dungeon_startingRow">Starting Row</label>
+		</div>
+	</div>
 
-	<hr>
-	<input type="checkbox" id="displayTileLabels" ischecked >
-	<label for="displayTileLabels">displayTileLabels</label>
+	<div class="input-group">
+		<div class="input-item">
+			<input type="checkbox" id="displayTileLabels" ischecked >
+			<label for="displayTileLabels">displayTileLabels</label>
+		</div>
+	</div>
 
 </div>
 
