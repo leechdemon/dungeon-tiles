@@ -1,3 +1,4 @@
+const version = '';
 const dungeon = document.getElementById('dungeon');
 
 const displayTileLabels = document.getElementById('displayTileLabels')
@@ -68,7 +69,7 @@ function AssignTile( id ) {
 ////			}
 //		}
 //		
-		console.log( 'neighborTilesetArray ('+id+')', neighborTilesetArray );
+//		console.log( 'neighborTilesetArray ('+id+')', neighborTilesetArray );
 
 		if( neighborTilesetArray.left.right == id ) {
 			if( !neighborTilesetArray.top.bottom && !neighborTilesetArray.right.left && !neighborTilesetArray.bottom.top ) {
@@ -147,12 +148,11 @@ function AssignTile( id ) {
 			}
 		}
 		if( neighborTilesetArray.left && neighborTilesetArray.top && neighborTilesetArray.right && neighborTilesetArray.bottom ) {
-			console.log('maybe X...');
-			if( ( neighborTilesetArray.left == 'blank' || !neighborTilesetArray.left.right ) &&
-				( neighborTilesetArray.top == 'blank' || !neighborTilesetArray.top.bottom ) &&
-				( neighborTilesetArray.right == 'blank' || !neighborTilesetArray.right.left ) &&
-				( neighborTilesetArray.bottom == 'blank' || !neighborTilesetArray.bottom.top ) ) {
-			   tiles.X = true;
+			if( ( neighborTilesetArray.left == 'blank' || neighborTilesetArray.left.right == id ) &&
+				( neighborTilesetArray.top == 'blank' || neighborTilesetArray.top.bottom == id ) &&
+				( neighborTilesetArray.right == 'blank' || neighborTilesetArray.right.left == id ) &&
+				( neighborTilesetArray.bottom == 'blank' || neighborTilesetArray.bottom.top == id ) ) {
+				tiles.X = true;
 			}
 		}
 		
@@ -311,7 +311,7 @@ function DisplayTileLabels( drawList_x, id ) {
 	if( displayTileLabels.checked ) { display = 'display: flex; '; }
 
 	var thisLabel = GetTileFromCoordinates( GetCoordinatesFromId( id ) );
-	thisLabel.innerHTML = '<div class="tileLabel" style="'+display+'"><div>' +drawList_x+'</div><div style="clear: both;">Tile_'+id+'</div></div>';
+	thisLabel.innerHTML = '<div class="tileLabel" style="'+display+'"><div>#' +drawList_x+'</div><div style="clear: both;">Tile_'+id+'</div></div>';
 }
 function DrawDungeon() {
 	var drawLimit = document.getElementById( 'tool_limit' ).value;
