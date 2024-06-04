@@ -48,29 +48,6 @@ function AssignTile( id ) {
 		tiles.X = true;
 	}
 	else {
-		/* Add to array based on current paths */
-//		if( paths.top && paths.bottom && paths.left && paths.right ) { tiles.X = true; }
-//		
-//		if( paths.right && paths.bottom && paths.left) { tiles.T1 = true; }
-//		if( paths.bottom && paths.left && paths.top ) { tiles.T2 = true; }
-//		if( paths.left && paths.top && paths.right ) { tiles.T3 = true; }
-//		if( paths.top && paths.right && paths.bottom ) { tiles.T4 = true; }
-////		
-//		if( paths.left && paths.right) {
-////			console.log('hallway1');
-////			if( !paths.top.bottom && !paths.bottom.top ) {
-//				tiles.hallway1 = true;
-////			}
-//		}
-//		if( paths.top && paths.bottom) {
-////			console.log('hallway2');
-////			if( !paths.left.right && !paths.right.left ) {
-//				tiles.hallway2 = true;
-////			}
-//		}
-//		
-//		console.log( 'neighborTilesetArray ('+id+')', neighborTilesetArray );
-
 		if( neighborTilesetArray.left.right == id ) {
 			if( !neighborTilesetArray.top.bottom && !neighborTilesetArray.right.left && !neighborTilesetArray.bottom.top ) {
 				tiles.cap1 = true;
@@ -173,16 +150,24 @@ function AssignTile( id ) {
 	/* Assign random tile from list */
 	var div = document.getElementById( 'tile_' + id );
 	const randomObjectValue = tiles => Object.keys(tiles)[(Math.random() * Object.keys(tiles).length) | 0];
-	var randomProp = '';
+	var randomProp = randomObjectValue( tiles );
 	
-	var hallwayLength = document.getElementById( 'hallwayLength' ).value;
-	for( var x = 0; x <= hallwayLength; x++ ) {
-		if( randomProp != 'hallway1' && randomProp != 'hallway2' ) {
-			randomProp = randomObjectValue( tiles );
-		} else {
-			break;
+//	console.log( 'neighborTilesetArray', neighborTilesetArray );
+	
+	var neighborIsHallway = false;
+	if( neighborTilesetArray.left != 'blank' && neighborTilesetArray.left. ) { neighborIsHallway = true; }
+
+	if( neighborIsHallway ) {
+		var hallwayLength = document.getElementById( 'hallwayLength' ).value;
+		for( var x = 0; x <= hallwayLength; x++ ) {
+			if( randomProp != 'hallway1' && randomProp != 'hallway2' ) {
+				randomProp = randomObjectValue( tiles );
+			} else {
+				break;
+			}
 		}
 	}
+	
 	div.classList.add( 'tile-' + randomProp );
 	div.classList.replace('tile-blank', 'tile');
 //	console.log('tiles ('+id+')', tiles);		
@@ -325,7 +310,7 @@ function DrawDungeon() {
 	var drawLimit = document.getElementById( 'tool_limit' ).value;
 	for( var x = 0; x < drawLimit; x++ ) {		
 		if( drawList[x] ) {
-//			console.log('DRAWLIST', x);
+			console.log('DRAWLIST', x);
 			
 			if( GetTileFromCoordinates( GetCoordinatesFromId( drawList[x] ) ).classList.contains('tile-blank') ) {
 				AssignTile( drawList[x] );
