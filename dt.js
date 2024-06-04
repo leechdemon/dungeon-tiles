@@ -33,10 +33,10 @@ var drawList = [];
 function DrawList_AddNeighbors( id  ) {
 	var paths = GetNeighborByTileset( id );
 	
-	if( paths.left ) { drawList.push( paths.left ); }
-	if( paths.right ) { drawList.push( paths.right ); }
-	if( paths.top ) { drawList.push( paths.top); }
-	if( paths.bottom ) { drawList.push( paths.bottom ); }
+	if( paths.left && !drawList.includes( paths.left ) ) { drawList.push( paths.left ); }
+	if( paths.right && !drawList.includes( paths.right ) ) { drawList.push( paths.right ); }
+	if( paths.top && !drawList.includes( paths.top ) ) { drawList.push( paths.top); }
+	if( paths.bottom && !drawList.includes( paths.bottom ) ) { drawList.push( paths.bottom ); }
 }
 function AssignTile( id ) {
 	var tiles = { 'X' : false, 'T1' : false, 'T2' : false, 'T3' : false, 'T4' : false, 'hallway1' : false, 'hallway2' : false, 'cap1' : false, 'cap2' : false, 'cap3' : false, 'cap4' : false };
@@ -154,8 +154,8 @@ function AssignTile( id ) {
 	
 //	console.log( 'neighborTilesetArray', neighborTilesetArray );
 	
-	var neighborIsHallway = false;
-	if( neighborTilesetArray.left != 'blank' && neighborTilesetArray.left. ) { neighborIsHallway = true; }
+	var neighborIsHallway = true;
+//	if( neighborTilesetArray.left != 'blank' && neighborTilesetArray.left ) { neighborIsHallway = true; } 
 
 	if( neighborIsHallway ) {
 		var hallwayLength = document.getElementById( 'hallwayLength' ).value;
@@ -169,7 +169,7 @@ function AssignTile( id ) {
 	}
 	
 	div.classList.add( 'tile-' + randomProp );
-	div.classList.replace('tile-blank', 'tile');
+	div.classList.replace('tile-blank', 'tile-hidden');
 //	console.log('tiles ('+id+')', tiles);		
 }
 function CreateDungeonGrid() {
@@ -306,19 +306,29 @@ function DisplayTileLabels( drawList_x, id ) {
 	var thisLabel = GetTileFromCoordinates( GetCoordinatesFromId( id ) );
 	thisLabel.innerHTML = '<div class="tileLabel" style="'+display+'"><div>#' +drawList_x+'</div><div style="clear: both;">Tile_'+id+'</div></div>';
 }
+function TileReveal( x ) {
+	setTimeout( function() {
+		var thisDiv = document.getElementById( 'tile_' + drawList[x] );
+		thisDiv.classList.replace('tile-hidden', 'tile');
+	}, 050 * x );
+}
 function DrawDungeon() {
 	var drawLimit = document.getElementById( 'tool_limit' ).value;
 	for( var x = 0; x < drawLimit; x++ ) {		
 		if( drawList[x] ) {
-			console.log('DRAWLIST', x);
+			console.log('DRAWLIST', x, drawList);
 			
 			if( GetTileFromCoordinates( GetCoordinatesFromId( drawList[x] ) ).classList.contains('tile-blank') ) {
 				AssignTile( drawList[x] );
 				DisplayTileLabels( x, drawList[x] );
-				
+
 				DrawList_AddNeighbors( drawList[x] );
 			}
 		}
+	}
+	
+	for( var x = 0; x < drawLimit; x++ ) {
+		TileReveal( x );
 	}
 }
 function GetCoordinatesFromId( id ) {

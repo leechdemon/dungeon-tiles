@@ -1,17 +1,18 @@
-<?php $version = "0.2.2c"; ?>
+<?php $version = "0.2.3"; ?>
 
 <style>
-	#dungeon { width: 75%; }
+	#dungeon { width: 75%; background-color: #2d303d; }
 	#tools { width: 25%; }
 	#tools button { margin: 1rem; max-width: 50%; }
 	#tools input { width: 100%; }
 	#tools .input-group { max-width: 100%; clear: both; margin: 1rem; }
 	#tools .input-item { max-width: 45%; text-align: center; margin: 0.25rem; float: left; }
 
-	.tile, .tile-blank { color: white; font-size: small; width: 15px; height: 15px; float: left; text-align: center; background-size: contain; background-color: #2d303d; /* opacity: 0; transition-duration: 0.25s; */ padding: 0px; }
+	.tile, .tile-blank, .tile-hidden { color: white; font-size: small; width: 15px; height: 15px; float: left; text-align: center; background-size: contain; background-color: #2d303d;  opacity: 1;  transition-duration: 0.25s; padding: 0px; }
 	@media screen and (max-width: 500px) {
 		.tile { width: 25px; height: 25px; }
 	}
+	.tile-hidden { opacity: 0 !important; }
 	.tile:hover .tileLabel { display: block !important; } 
 	.tileLabel { font-weight: 800; font-size: smaller; }
 
@@ -40,34 +41,34 @@
   
 	<div class="input-group">
 		<div class="input-item">
-			<input type="number" id="tool_limit" value="75">
+			<input type="number" id="tool_limit" value="750">
 			<label for="tool_limit">Limit</label>
 		</div>
 	</div>
 	<div class="input-group">
 		<div class="input-item">
-			<input type="number" id="dungeon_width" value="15">
+			<input type="number" id="dungeon_width" value="20">
 			<label for="dungeon_width">Width</label>
 		</div>
 		<div class="input-item">
-			<input type="number" id="dungeon_height" value="15">
+			<input type="number" id="dungeon_height" value="20">
 			<label for="dungeon_height">Height</label>
 		</div>
 	</div>
 	<div class="input-group">
 		<div class="input-item">
-			<input type="number" id="hallwayLength" value="2">
+			<input type="number" id="hallwayLength" value="3">
 			<label for="hallwayLength">Hallway Length</label>
 		</div>
 	</div>
 	<div class="input-group">
 		<div class="input-item">
-			<input type="number" id="dungeon_startingCol" value="6">
-			<label for="dungeon_startingCol">Starting Col</label>
+			<input type="number" id="dungeon_startingRow" value="10">
+			<label for="dungeon_startingRow">Starting Row</label>
 		</div>
 		<div class="input-item">
-			<input type="number" id="dungeon_startingRow" value="6">
-			<label for="dungeon_startingRow">Starting Row</label>
+			<input type="number" id="dungeon_startingCol" value="10">
+			<label for="dungeon_startingCol">Starting Col</label>
 		</div>
 	</div>
 
