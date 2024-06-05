@@ -38,7 +38,20 @@ function DrawList_AddNeighbors( id  ) {
 	if( paths.top && !drawList.includes( paths.top ) ) { drawList.push( paths.top); }
 	if( paths.bottom && !drawList.includes( paths.bottom ) ) { drawList.push( paths.bottom ); }
 }
+function DrawList_AddNeighbors2( id  ) {
+	var paths = GetNeighborByTileset( id );
+//	console.log( paths );
+
+	if( paths.left && document.getElementById('tile_'+paths.left).classList.contains('tile-blank') ) { document.getElementById( 'tile_'+paths.left ).classList.add( 'move-available' ); }
+	if( paths.right && document.getElementById('tile_'+paths.right).classList.contains('tile-blank') ) { document.getElementById( 'tile_'+paths.right ).classList.add( 'move-available' ); }
+	if( paths.top && document.getElementById('tile_'+paths.top).classList.contains('tile-blank') ) { document.getElementById( 'tile_'+paths.top ).classList.add( 'move-available'); }
+	if( paths.bottom && document.getElementById('tile_'+paths.bottom).classList.contains('tile-blank') ) { document.getElementById( 'tile_'+paths.bottom ).classList.add( 'move-available' ); }
+}
 function AssignTile( id ) {
+	document.getElementById('tile_' + id).classList.remove('move-available');
+	drawList.push( id );
+
+	
 	var tiles = { 'X' : false, 'T1' : false, 'T2' : false, 'T3' : false, 'T4' : false, 'hallway1' : false, 'hallway2' : false, 'cap1' : false, 'cap2' : false, 'cap3' : false, 'cap4' : false };
 	var paths = GetNeighborArray( id );
 	var neighborTilesetArray = GetNeighborTilesetArray( paths );
@@ -169,9 +182,32 @@ function AssignTile( id ) {
 	}
 	
 	div.classList.add( 'tile-' + randomProp );
-	div.classList.replace('tile-blank', 'tile-hidden');
+	div.classList.replace('tile-blank', 'hiddenTile');
 //	console.log('tiles ('+id+')', tiles);		
+	
+	DrawList_AddNeighbors2( id );
+	AutoDrawHallwayTiles( id );
 }
+function AutoDrawHallwayTiles( id ) {
+	var paths = GetNeighborArray( id );
+	var tileType = GetTileTypeFromId( id );
+
+	if( tileType == 'hallway1' && GetTileTypeFromId(paths.left) == 'blank' ) { AssignTile( paths.left ); }
+	if( tileType == 'hallway1' && GetTileTypeFromId(paths.right) == 'blank' ) { AssignTile( paths.right ); }
+	if( tileType == 'hallway2' && GetTileTypeFromId(paths.top) == 'blank' ) { AssignTile( paths.top ); }
+	if( tileType == 'hallway2' && GetTileTypeFromId(paths.bottom) == 'blank' ) { AssignTile( paths.bottom ); }
+}
+function GetTileTypeFromId( id ) {
+	var tileType = 'unknown';
+	var div = document.getElementById( 'tile_' + id );
+	for( var x = 0; x < div.classList.length; x++ ) {
+		if( div.classList[x].includes('tile-') ) { tileType = div.classList[x].replace('tile-', ''); }
+	}
+	
+	return tileType;
+}
+
+
 function CreateDungeonGrid() {
 	var tileCount = 1;
 	dungeon.innerHTML = '';
@@ -297,6 +333,7 @@ function ResetDungeon() {
 
 
 	drawList = [ GetTileIdFromCoordinates( [ startRow, startCol ] ) ];
+//	console.log( 'drawList', drawList );
 	DrawDungeon();
 }
 function DisplayTileLabels( drawList_x, id ) {
@@ -309,27 +346,28 @@ function DisplayTileLabels( drawList_x, id ) {
 function TileReveal( x ) {
 	setTimeout( function() {
 		var thisDiv = document.getElementById( 'tile_' + drawList[x] );
-		thisDiv.classList.replace('tile-hidden', 'tile');
-	}, 050 * x );
+		if( thisDiv ) { thisDiv.classList.replace('hiddenTile', 'tile'); }
+	}, 0050 * x );
 }
 function DrawDungeon() {
 	var drawLimit = document.getElementById( 'tool_limit' ).value;
 	for( var x = 0; x < drawLimit; x++ ) {		
 		if( drawList[x] ) {
-			console.log('DRAWLIST', x, drawList);
+//			console.log('DRAWLIST', x, drawList);
 			
 			if( GetTileFromCoordinates( GetCoordinatesFromId( drawList[x] ) ).classList.contains('tile-blank') ) {
 				AssignTile( drawList[x] );
 				DisplayTileLabels( x, drawList[x] );
 
-				DrawList_AddNeighbors( drawList[x] );
+//				DrawList_AddNeighbors( drawList[x] );
+				DrawList_AddNeighbors2( drawList[x] );
 			}
 		}
 	}
 	
-	for( var x = 0; x < drawLimit; x++ ) {
-		TileReveal( x );
-	}
+//	for( var x = 0; x < drawLimit; x++ ) {
+//		TileReveal( x );
+//	}
 }
 function GetCoordinatesFromId( id ) {
 	var tile = document.getElementById( 'tile_'+id );

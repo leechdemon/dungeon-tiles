@@ -1,4 +1,4 @@
-<?php $version = "0.2.3"; ?>
+<?php $version = "0.3.0"; ?>
 
 <style>
 	#dungeon { width: 75%; background-color: #2d303d; }
@@ -8,13 +8,16 @@
 	#tools .input-group { max-width: 100%; clear: both; margin: 1rem; }
 	#tools .input-item { max-width: 45%; text-align: center; margin: 0.25rem; float: left; }
 
-	.tile, .tile-blank, .tile-hidden { color: white; font-size: small; width: 15px; height: 15px; float: left; text-align: center; background-size: contain; background-color: #2d303d;  opacity: 1;  transition-duration: 0.25s; padding: 0px; }
+	.tile, .tile-blank, .hiddenTile { color: white; font-size: small; width: 15px; height: 15px; float: left; text-align: center; background-size: contain; background-color: #2d303d;  opacity: 1;  /* transition-duration: 0.25s; */ padding: 0px; }
 	@media screen and (max-width: 500px) {
 		.tile { width: 25px; height: 25px; }
 	}
-	.tile-hidden { opacity: 0 !important; }
-	.tile:hover .tileLabel { display: block !important; } 
+/*	.hiddenTile { opacity: 0 !important; }*/
+/*	.tile:hover .tileLabel { display: block !important; } */
 	.tileLabel { font-weight: 800; font-size: smaller; }
+	
+	.move-available { background-color: #ff000044; }
+	.move-available:hover { background-color: #ff000099; }
 
 	.tile-X { background-image: url("/wp-content/uploads/2024/05/tile-x.jpg"); transform: scale(1.05); }
 
@@ -82,3 +85,4 @@
 </div>
 
 <script type="text/javascript" src="<?php echo get_stylesheet_directory_uri(); ?>/dungeon-tiles/dt.js?v=<?php echo random_int(0,99999); ?>"></script>
+<script type="text/javascript" src="<?php echo get_stylesheet_directory_uri(); ?>/dungeon-tiles/includes/controls.js?v=<?php echo random_int(0,99999); ?>"></script>
