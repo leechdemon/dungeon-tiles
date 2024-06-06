@@ -1,14 +1,14 @@
 <?php $version = "0.3.0"; ?>
 
 <style>
-	#dungeon { width: 75%; background-color: #2d303d; }
+	#dungeonWindow { width: 75%; background-color: #2d303d; }
 	#tools { width: 25%; }
 	#tools button { margin: 1rem; max-width: 50%; }
 	#tools input { width: 100%; }
 	#tools .input-group { max-width: 100%; clear: both; margin: 1rem; }
 	#tools .input-item { max-width: 45%; text-align: center; margin: 0.25rem; float: left; }
 
-	.tile, .tile-blank, .hiddenTile { color: white; font-size: small; width: 15px; height: 15px; float: left; text-align: center; background-size: contain; background-color: #2d303d;  opacity: 1;  /* transition-duration: 0.25s; */ padding: 0px; }
+	.tile, .tile-blank, .hiddenTile, .tile-blocked { color: white; font-size: small; width: 15px; height: 15px; float: left; text-align: center; background-size: contain; background-color: #2d303d;  opacity: 1;  /* transition-duration: 0.25s; */ padding: 0px; }
 	@media screen and (max-width: 500px) {
 		.tile { width: 25px; height: 25px; }
 	}
@@ -35,9 +35,10 @@
 	.tile-cap4 { background-image: url("/wp-content/uploads/2024/05/tile-cap.jpg"); transform: rotate(270deg) scale(1.05); }
 
 	.tile-red { background-color: red; }
+	.tile-blocked { background-color: #111216; }
 </style>
 
-<div id="dungeon"></div>
+<div id="dungeonWindow"></div>
 <div id="tools">
 	<p style="float: right;">v<?php echo $version; ?></p>
 	<button onclick="javascript:ResetDungeon();">Reset Dungeon</button>

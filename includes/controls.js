@@ -6,7 +6,13 @@ function playTile(event) {
 	if( tile.classList.contains( 'move-available' ) ) {
 		AssignTile( tileId );
 //		DisplayTileLabels( drawList.length, tileId );
-  }
+	}
+	else {
+		if( tile.classList.contains( 'tile-blank' ) ) {
+			tile.classList.add('tile-blank', 'tile-blocked' );
+			console.log( 'Blocked: '+tileId );
+		}
+	}
 }
 
-dungeon.addEventListener("click", playTile);
+dungeonWindow.addEventListener("click", playTile);
