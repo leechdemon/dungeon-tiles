@@ -4,6 +4,7 @@ function playTile(event) {
 	var tile = event.target;
 	var tileId = tile.id.replace('tile_', '');
 	if( tile.classList.contains( 'move-available' ) ) {
+		document.getElementById('tile_' + tileId).classList.remove('move-available');
 		AssignTile( tileId );
 //		DisplayTileLabels( drawList.length, tileId );
 	}

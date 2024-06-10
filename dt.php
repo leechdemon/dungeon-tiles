@@ -45,9 +45,14 @@
   
 	<div class="input-group">
 		<div class="input-item">
-			<input type="number" id="tool_limit" value="750">
+			<input type="number" id="tool_limit" value="75">
 			<label for="tool_limit">Limit</label>
 		</div>
+		<div class="input-item">
+			<input type="checkbox" id="autoDraw" unchecked>
+			<label for="tool_limit">autoDraw</label>
+		</div>
+		<div id="limit_number"></div>
 	</div>
 	<div class="input-group">
 		<div class="input-item">
@@ -60,6 +65,10 @@
 		</div>
 	</div>
 	<div class="input-group">
+		<div class="input-item">
+			<input type="number" id="hallwayChance" value="30">
+			<label for="hallwayChance">Hallway %Chance</label>
+		</div>
 		<div class="input-item">
 			<input type="number" id="hallwayLength" value="3">
 			<label for="hallwayLength">Hallway Length</label>

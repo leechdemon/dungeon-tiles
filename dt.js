@@ -24,187 +24,106 @@ var startCol = 0;
 var startRow = 0;
 var drawList = [];
 
-
-/* Jason */
-/* Instead of using a complicated "serial-if" argument... */
-	/* ...What if we combine the Neighbor arrays to create a single array for "Do I get to draw something here?" */
-	/* Then, each Tile Assignment is a single-dimensional array. */
-
+const autodraw = '';
 
 function DrawList_AddNeighbors( id  ) {
-	var paths = GetNeighborByTileset( id );
-	
-	if( paths.left && !drawList.includes( paths.left ) ) { drawList.push( paths.left ); }
-	if( paths.right && !drawList.includes( paths.right ) ) { drawList.push( paths.right ); }
-	if( paths.top && !drawList.includes( paths.top ) ) { drawList.push( paths.top); }
-	if( paths.bottom && !drawList.includes( paths.bottom ) ) { drawList.push( paths.bottom ); }
-}
-function DrawList_AddNeighbors2( id  ) {
-	var paths = GetNeighborByTileset( id );
-
-	if( paths.left && document.getElementById('tile_'+paths.left).classList.contains('tile-blank') ) { document.getElementById( 'tile_'+paths.left ).classList.add( 'move-available' ); }
-	if( paths.right && document.getElementById('tile_'+paths.right).classList.contains('tile-blank') ) { document.getElementById( 'tile_'+paths.right ).classList.add( 'move-available' ); }
-	if( paths.top && document.getElementById('tile_'+paths.top).classList.contains('tile-blank') ) { document.getElementById( 'tile_'+paths.top ).classList.add( 'move-available'); }
-	if( paths.bottom && document.getElementById('tile_'+paths.bottom).classList.contains('tile-blank') ) { document.getElementById( 'tile_'+paths.bottom ).classList.add( 'move-available' ); }
+	var available = dungeon.tiles[ id ].available;
+	var neighbors = dungeon.tiles[ id ].neighbors;	
+		
+	if( available.left ) { document.getElementById( 'tile_'+neighbors.left ).classList.add( 'move-available' ); }
+	if( available.right ) { document.getElementById( 'tile_'+neighbors.right ).classList.add( 'move-available' ); }
+	if( available.top ) { document.getElementById( 'tile_'+neighbors.top ).classList.add( 'move-available'); }
+	if( available.bottom ) { document.getElementById( 'tile_'+neighbors.bottom ).classList.add( 'move-available' ); }
 }
 function AssignTile( id ) {
-	document.getElementById('tile_' + id).classList.remove('move-available');
+	console.log( id );
+	
+	
 	drawList.push( id );
+	document.getElementById('limit_number').innerHTML = drawList.length;
+	 
+	var neighbors = dungeon.tiles[id].neighbors;
+	var type_options = { 'X' : false, 'T1' : false, 'T2' : false, 'T3' : false, 'T4' : false, 'hallway1' : false, 'hallway2' : false, 'cap1' : false, 'cap2' : false, 'cap3' : false, 'cap4' : false };
 	
-	var tiles = { 'X' : false, 'T1' : false, 'T2' : false, 'T3' : false, 'T4' : false, 'hallway1' : false, 'hallway2' : false, 'cap1' : false, 'cap2' : false, 'cap3' : false, 'cap4' : false };
-	var paths = GetNeighborArray( id );
-	var neighborTilesetArray = GetNeighborTilesetArray( paths );
+	/* Reset this, in case there's been a change. */
+		SetAvailableByNeighbors( id );
+		var available = dungeon.tiles[id].available;
+		SetRequiredByNeighbor( id );
+		var required = dungeon.tiles[id].required;
 
-	
-//	console.log(id, 'paths', paths );
-//	console.log(id, 'neighborTilesetArray', neighborTilesetArray );
-//	console.log( 'neighborTilesetArray', neighborTilesetArray );
-	
 	/* First-card Force */
 	if( drawList.length == 1 ) {
-		tiles.X = true;
+		type_options.X = true;
 	}
 	else {
+		if( required.left && !required.top && !required.right && !required.bottom ) { type_options.cap1 = true; }
+		if( required.top && !required.left && !required.bottom && !required.right ) { type_options.cap2 = true; }
+		if( required.right && !required.bottom && !required.left && !required.top ) { type_options.cap3 = true; }
+		if( required.bottom && !required.left && !required.top && !required.right ) { type_options.cap4 = true; }
 		
-//		console.log( id, 'neighborTilesetArray', neighborTilesetArray );
-
-		if( neighborTilesetArray.left.right == id ) {
-			if( !neighborTilesetArray.top.bottom && !neighborTilesetArray.right.left && !neighborTilesetArray.bottom.top ) {
-//				tiles.cap1 = true;
-			}
-
-			if( neighborTilesetArray.right ) {
-				if ( neighborTilesetArray.right.left == 'blank' || !neighborTilesetArray.right.left ) {
-					if( !neighborTilesetArray.bottom.top && !neighborTilesetArray.top.bottom ) {
-						tiles.hallway1 = true;
-					}
-
-//					if (neighborTilesetArray.top == 'blank' || !neighborTilesetArray.top.bottom ) {
-//						tiles.T1 = true;
-//					} else if (neighborTilesetArray.bottom == 'blank' || !neighborTilesetArray.bottom.top ) {
-//						tiles.T3 = true;
-//					}
-				}
-			}
-		}
-		if( neighborTilesetArray.top.bottom == id ) {
-			if( !neighborTilesetArray.right.left && !neighborTilesetArray.bottom.top && !neighborTilesetArray.left.right ) {
-//				tiles.cap2 = true;
-			}
-
-			if( neighborTilesetArray.bottom ) {
-				if ( neighborTilesetArray.bottom.top == 'blank' || !neighborTilesetArray.bottom.top ) {
-					if( !neighborTilesetArray.left.right && !neighborTilesetArray.right.left ) {
-						tiles.hallway2 = true;
-					}
-
-//					if (neighborTilesetArray.right == 'blank' || !neighborTilesetArray.right.left ) {
-//						tiles.T4 = true;
-//					} else if (neighborTilesetArray.left == 'blank' || !neighborTilesetArray.left.right ) {
-//						tiles.T2 = true;
-//					}
-				}
-			}
-		}
-		if( neighborTilesetArray.right.left == id ) {
-			if( !neighborTilesetArray.bottom.top && !neighborTilesetArray.left.right && !neighborTilesetArray.top.bottom ) {
-//				tiles.cap3 = true;
-			}
-
-			if( neighborTilesetArray.left ) {
-				if ( neighborTilesetArray.left.right == 'blank' || !neighborTilesetArray.left.right ) {
-					if( !neighborTilesetArray.top.bottom && !neighborTilesetArray.bottom.top ) {
-						tiles.hallway1 = true;
-					}
-
-//					if ( neighborTilesetArray.bottom == 'blank' || !neighborTilesetArray.bottom.top ) {
-//						tiles.T3 = true;
-//					} else if ( neighborTilesetArray.top == 'blank' || !neighborTilesetArray.top.bottom ) {
-//						tiles.T1 = true;
-//					}
-				}
-			}
-		}
-		if( neighborTilesetArray.bottom.top == id ) {
-			if( !neighborTilesetArray.left.right && !neighborTilesetArray.right.left && !neighborTilesetArray.bottom.top ) {
-//				tiles.cap4 = true;
-			}
-
-			if( neighborTilesetArray.top ) {
-				if ( neighborTilesetArray.top.bottom == 'blank' || !neighborTilesetArray.top.bottom ) {
-					if( !neighborTilesetArray.right.left && !neighborTilesetArray.left.right ) {
-						tiles.hallway2 = true;
-					}
-
-//					if (neighborTilesetArray.left == 'blank' || !neighborTilesetArray.left.right ) {
-//						tiles.T2 = true;
-//					} else if (neighborTilesetArray.right == 'blank' || !neighborTilesetArray.right.left ) {
-//						tiles.T4 = true;
-//					}
-				}
-			}
-		}
+		if( (required.left || available.left) && !required.top && (required.right || available.right) && !required.bottom ) { type_options.hallway1 = true; }
+		if( !required.left && (required.top || available.top) && !required.right && (required.bottom || available.bottom) ) { type_options.hallway2 = true; }
 		
-		/* Should 'X' be added? */
-//		if( neighborTilesetArray.left && neighborTilesetArray.top && neighborTilesetArray.right && neighborTilesetArray.bottom ) {
-//			if( ( neighborTilesetArray.left == 'blank' || neighborTilesetArray.left.right == id ) &&
-//				( neighborTilesetArray.top == 'blank' || neighborTilesetArray.top.bottom == id ) &&
-//				( neighborTilesetArray.right == 'blank' || neighborTilesetArray.right.left == id ) &&
-//				( neighborTilesetArray.bottom == 'blank' || neighborTilesetArray.bottom.top == id ) ) {
-//				tiles.X = true;
-//			}
-//		}
+		if( (required.left || available.left) && !required.top && (required.right || available.right) && (required.bottom || available.bottom) ) { type_options.T1 = true; }
+		if( (required.left || available.left) && (required.top || available.top) && !required.right && (required.bottom || available.bottom) ) { type_options.T2 = true; }
+		if( (required.left || available.left) && (required.top || available.top) && (required.right | available.right) && !required.bottom ) { type_options.T3 = true; }
+		if( !required.left && (required.top || available.top) && (required.right || available.right) && (required.bottom || available.bottom ) ) { type_options.T4 = true; }
 		
+		if( (required.left || available.left) && (required.top || available.top) && (required.right || available.right) && (required.right || available.right) ) { type_options.X = true; }		
 	}
-
-	for(var key in tiles) { if(!tiles[key]) delete tiles[key]; }
-
+	
 	/* Assign random tile from list */
-	var div = document.getElementById( 'tile_' + id );
-	const randomObjectValue = tiles => Object.keys(tiles)[(Math.random() * Object.keys(tiles).length) | 0];
-	var randomProp = randomObjectValue( tiles );
-	
-	var neighborIsHallway = false;
-//	if( neighborTilesetArray.left != 'blank' && neighborTilesetArray.left ) { neighborIsHallway = true; } 
+		for(var key in type_options) { if(!type_options[key]) delete type_options[key]; }
+		const randomObjectValue = type_options => Object.keys(type_options)[(Math.random() * Object.keys(type_options).length) | 0];
+		var randomProp = randomObjectValue( type_options );
 
-	if( neighborIsHallway ) {
-		var hallwayLength = document.getElementById( 'hallwayLength' ).value;
-		for( var x = 0; x <= hallwayLength; x++ ) {
-			if( randomProp != 'hallway1' && randomProp != 'hallway2' ) {
-				randomProp = randomObjectValue( tiles );
-			} else {
-				break;
+	/* Increase chance of longer hallways */
+		if( ( dungeon.tiles[ neighbors.left ] && dungeon.tiles[ neighbors.left ].type == 'hallway1' ) || ( dungeon.tiles[ neighbors.right ] && dungeon.tiles[ neighbors.right ].type == 'hallway1' ) ) { var neighborIsHallway = true; }
+		if( ( dungeon.tiles[ neighbors.top ] && dungeon.tiles[ neighbors.top ].type == 'hallway2' ) || ( dungeon.tiles[ neighbors.bottom ] && dungeon.tiles[ neighbors.bottom ].type == 'hallway2' ) ) { var neighborIsHallway = true; }
+
+
+		if( neighborIsHallway ) {
+			var hallwayLength = document.getElementById( 'hallwayLength' ).value;
+			for( var x = 0; x <= hallwayLength; x++ ) {
+				if( randomProp != 'hallway1' && randomProp != 'hallway2' ) {
+					randomProp = randomObjectValue( type_options );
+				} else {
+					break;
+				}
 			}
 		}
-	}
 	
-	
-	dungeon.tiles[id].type = randomProp;
-	dungeon.tiles[id].type_options = tiles;
-	div.classList.add( 'tile-' + randomProp );
-	div.classList.replace('tile-blank', 'hiddenTile');
-//	div.classList.remove('tile-blank');
-	
-	DrawList_AddNeighbors2( id );
+	/* %Chance of forced hallway */
+		var hallwayChance = document.getElementById('hallwayChance').value / 100;
+		if( Math.random() < hallwayChance ) {
+			/* Force a hallway */
+			if( type_options.hallway1 ) { randomProp = 'hallway1'; }
+			if( type_options.hallway2 ) { randomProp = 'hallway2'; }
+		} 
+
+	/* update the dungeon object, neighbors */
+		dungeon.tiles[id].type = randomProp;
+		dungeon.tiles[id].type_options = type_options;
+
+		var div = document.getElementById( 'tile_' + id );
+		div.classList.add( 'tile-' + randomProp );
+		div.classList.replace('tile-blank', 'tile');
+
+	SetRequiredByTileset( id ); 
+	SetAvailableByTileset( id );
+
+	DrawList_AddNeighbors( id );
 	AutoDrawHallwayTiles( id );
-//	console.log( 'dungeon.tiles['+id+']', dungeon.tiles[id].type, dungeon.tiles[id].type_options);
 }
 function AutoDrawHallwayTiles( id ) {
-	var paths = GetNeighborArray( id );
-	var tileType = GetTileTypeFromId( id );
-	
-	if( tileType == 'hallway1' && GetTileTypeFromId(paths.left) == 'blank' ) { AssignTile( paths.left ); }
-	if( tileType == 'hallway1' && GetTileTypeFromId(paths.right) == 'blank' ) { AssignTile( paths.right ); }
-	if( tileType == 'hallway2' && GetTileTypeFromId(paths.top) == 'blank' ) { AssignTile( paths.top ); }
-	if( tileType == 'hallway2' && GetTileTypeFromId(paths.bottom) == 'blank' ) { AssignTile( paths.bottom ); }
-}
-function GetTileTypeFromId( id ) {
+	var neighbors = dungeon.tiles[id].neighbors; 
 	var tileType = dungeon.tiles[id].type;
 	
-	return tileType;
+	if( tileType == 'hallway1' && dungeon.tiles[ neighbors.left ].type == 'blank' ) { AssignTile( neighbors.left ); }
+	if( tileType == 'hallway1' && dungeon.tiles[ neighbors.right ].type == 'blank' ) { AssignTile( neighbors.right ); }
+	if( tileType == 'hallway2' && dungeon.tiles[ neighbors.top ].type == 'blank' ) { AssignTile( neighbors.top ); }
+	if( tileType == 'hallway2' && dungeon.tiles[ neighbors.bottom ].type == 'blank' ) { AssignTile( neighbors.bottom ); }
 }
-
-
 function CreateDungeonGrid() {
 	var tileCount = 1;
 	dungeon.tiles = [];
@@ -217,8 +136,10 @@ function CreateDungeonGrid() {
 			var newDiv = document.createElement('div');
 			newDiv.id = 'tile_' + tileCount;
 			dungeon.tiles[ tileCount ] = { 'id' : tileCount, 'type' : 'blank' };
-			dungeon.tiles[ tileCount ].neighbors = [];
 			dungeon.tiles[ tileCount ].coordinates = { 'x' : y, 'y': x };
+			dungeon.tiles[ tileCount ].available = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
+			dungeon.tiles[ tileCount ].neighbors = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
+			dungeon.tiles[ tileCount ].required = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
 			tileCount++;
 			
 			newDiv.classList.add( 'row_' + x );
@@ -230,113 +151,250 @@ function CreateDungeonGrid() {
 
 			if(y == 1) { newDiv.classList.add('clear'); }
 		}
-	}
+	} 
+	
+	/* Neighbors can't be built until all tiles are created. */
+	for( var id in dungeon.tiles ) { BuildNeighborArray( id ); }
+	/* Tileset can't be used until AssignTile() is run. */
+//	for( var id in dungeon.tiles ) { SetAvailabilityByTileset( id ); }
 }
-function GetNeighborArray( id ) {
-	var edgePaths = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
-
+function BuildNeighborArray( id ) {
 	var coordinates = dungeon.tiles[id].coordinates;
-	/* Force us to stay on the grid */
-	if( coordinates.x != 1 ) { edgePaths.left = GetTileIdFromCoordinates( [ coordinates.x - 1, coordinates.y ] ); }
-	if( coordinates.x != gridWidth ) { edgePaths.right = GetTileIdFromCoordinates( [ coordinates.x + 1, coordinates.y ] ); }
-	if( coordinates.y != 1 ) { edgePaths.top = GetTileIdFromCoordinates( [ coordinates.x, coordinates.y - 1 ] ); }
-	if( coordinates.y != gridHeight ) { edgePaths.bottom = GetTileIdFromCoordinates( [ coordinates.x, coordinates.y + 1 ] ); }
-
+	var neighbors = dungeon.tiles[id].neighbors;
 	
-	/* Check for tile assignments */
-	var tilesetPaths = GetNeighborByTileset( id );
-	
-	var neighbors = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
-	if( edgePaths.left && tilesetPaths.left ) { neighbors.left = edgePaths.left; }
-	if( edgePaths.right && tilesetPaths.right ) { neighbors.right = edgePaths.right; }
-	if( edgePaths.top && tilesetPaths.top ) { neighbors.top = edgePaths.top; }
-	if( edgePaths.bottom && tilesetPaths.bottom ) { neighbors.bottom = edgePaths.bottom; }
-	
-	console.log( 'edgePaths', edgePaths );
-	console.log( 'tilesetPaths', tilesetPaths );
-	console.log( 'neighbors', neighbors );
+	/* If we're on the grid, assign a NeighbordId  */
+	if( coordinates.x != 1 ) {
+		neighbors.left = GetTileIdFromCoordinates( { 'x' : coordinates.x - 1, 'y' : coordinates.y } );
+	}
+	if( coordinates.x != gridWidth ) {
+		neighbors.right = GetTileIdFromCoordinates( { 'x' : coordinates.x + 1, 'y' : coordinates.y } );
+	}
+	if( coordinates.y != 1 ) {
+		neighbors.top = GetTileIdFromCoordinates( { 'x' : coordinates.x, 'y' : coordinates.y - 1 } );
+	}
+	if( coordinates.y != gridHeight ) {
+		neighbors.bottom = GetTileIdFromCoordinates( { 'x' : coordinates.x, 'y' : coordinates.y + 1 } );
+	}
 
 	dungeon.tiles[id].neighbors = neighbors;
-//	dungeon.tiles[id].edgePaths = edgePaths;
-	return neighbors;
 }
-function GetNeighborByTileset( id ) {	
-	var coordinates = dungeon.tiles[id].coordinates;
-	var tilesetPaths = [];
-
-	switch ( dungeon.tiles[id].type ) {
+function SetAvailableByNeighbors( id ) {	
+	var tile = dungeon.tiles[id];
+	var thisDiv = '';
+	
+	thisDiv  = document.getElementById( 'tile_' + tile.neighbors.left );	
+	if( thisDiv && thisDiv.classList.contains( 'tile-blank' ) ) { tile.available.left = true; }
+	thisDiv  = document.getElementById( 'tile_' + tile.neighbors.top );	
+	if( thisDiv && thisDiv.classList.contains( 'tile-blank' ) ) { tile.available.top = true; }
+	thisDiv  = document.getElementById( 'tile_' + tile.neighbors.right );	
+	if( thisDiv && thisDiv.classList.contains( 'tile-blank' ) ) { tile.available.right = true; }
+	thisDiv  = document.getElementById( 'tile_' + tile.neighbors.bottom );	
+	if( thisDiv && thisDiv.classList.contains( 'tile-blank' ) ) { tile.available.bottom = true; }
+	
+	tile = dungeon.tiles[id];
+}
+function SetRequiredByNeighbor( id ) {
+	var tile = dungeon.tiles[ id ];
+	var thisDiv = '';
+	
+	thisDiv = dungeon.tiles[ tile.neighbors.left ];
+	if( thisDiv && thisDiv.required.right ) { tile.required.left = true; }
+	thisDiv = dungeon.tiles[ tile.neighbors.top ];
+	if( thisDiv && thisDiv.required.bottom ) { tile.required.top = true; }
+	thisDiv = dungeon.tiles[ tile.neighbors.right ];
+	if( thisDiv && thisDiv.required.left ) { tile.required.right = true; }
+	thisDiv = dungeon.tiles[ tile.neighbors.bottom ];
+	if( thisDiv && thisDiv.required.top ) { tile.required.bottom = true; }
+	
+	dungeon.tiles[id].neighors = tile.neighbors;
+}
+function SetAvailableByTileset( id ) {
+	var tile = dungeon.tiles[id];
+	
+	switch ( tile.type ) {
 		case 'blank' :
-			tilesetPaths = { 'left' : true, 'top' : true, 'right' : true, 'bottom' : true };
+			tile.available.left = true;
+			tile.available.bottom = true;
+			tile.available.right = true;
+			tile.available.top = true;
 			break;
 		case 'blocked' :
-			tilesetPaths = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
+			tile.available.left = false;
+			tile.available.bottom = false;
+			tile.available.right = false;
+			tile.available.top = false;
 			break;
 		case 'X' :
-			tilesetPaths = { 'left' : true, 'top' : true, 'right' : true, 'bottom' : true };
+			tile.available.left = true;
+			tile.available.bottom = true;
+			tile.available.right = true;
+			tile.available.top = true;
 			break;
 		case 'T1' : 
-			tilesetPaths = { 'left' : true, 'top' : false, 'right' : true, 'bottom' : true };
+			tile.available.left = true;
+			tile.available.bottom = true;
+			tile.available.right = true;
+			tile.available.top = false;
 			break;
 		case 'T2' : 
-			tilesetPaths = { 'left' : true, 'top' : true, 'right' : false, 'bottom' : true };
+			tile.available.left = true;
+			tile.available.bottom = true;
+			tile.available.right = false;
+			tile.available.top = true;
 			break;
 		case 'T3' : 
-			tilesetPaths = { 'left' : true, 'top' : true, 'right' : true, 'bottom' : false };
+			tile.available.left = true;
+			tile.available.bottom = false;
+			tile.available.right = true;
+			tile.available.top = true;
 			break;
 		case 'T4' : 
-			tilesetPaths = { 'left' : false, 'top' : true, 'right' : true, 'bottom' : true };
+			tile.available.left = false;
+			tile.available.bottom = true;
+			tile.available.right = true;
+			tile.available.top = true;
 			break;
 		case 'hallway1' : 
-			tilesetPaths = { 'left' : true, 'top' : false, 'right' : true, 'bottom' : false };
+			tile.available.left = true;
+			tile.available.bottom = false;
+			tile.available.right = true;
+			tile.available.top = false;
 			break;
 		case 'hallway2' : 
-			tilesetPaths = { 'left' : false, 'top' : true, 'right' : false, 'bottom' : true };
+			tile.available.left = false;
+			tile.available.bottom = true;
+			tile.available.right = false;
+			tile.available.top = true;
 			break;
 		case 'cap1' : 
-			tilesetPaths = { 'left' : true, 'top' : false, 'right' : false, 'bottom' : false };
+			tile.available.left = false;
+			tile.available.bottom = false;
+			tile.available.right = false;
+			tile.available.top = false;
 			break;
 		case 'cap2' : 
-			tilesetPaths = { 'left' : false, 'top' : true, 'right' : false, 'bottom' : false };
+			tile.available.left = false;
+			tile.available.bottom = false;
+			tile.available.right = false; 
+			tile.available.top = false;
 			break;
 		case 'cap3' : 
-			tilesetPaths = { 'left' : false, 'top' : false, 'right' : true, 'bottom' : false };
+			tile.available.left = false;
+			tile.available.bottom = false;
+			tile.available.right = false;
+			tile.available.top = false;
 			break;
 		case 'cap4' : 
-			tilesetPaths = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : true };
+			tile.available.left = false;
+			tile.available.bottom = false;
+			tile.available.right = false;
+			tile.available.top = false;
 			break;
 	}
-	
-	if( tilesetPaths.left ) { tilesetPaths.left = ( GetTileIdFromCoordinates( [ coordinates.x - 1, coordinates.y ] ) ); }
-	if( tilesetPaths.right ) { tilesetPaths.right = ( GetTileIdFromCoordinates( [ coordinates.x + 1, coordinates.y ] ) ); }
-	if( tilesetPaths.top ) { tilesetPaths.top = ( GetTileIdFromCoordinates( [ coordinates.x, coordinates.y - 1 ] ) ); }
-	if( tilesetPaths.bottom ) { tilesetPaths.bottom = ( GetTileIdFromCoordinates( [ coordinates.x, coordinates.y + 1 ] ) ); }
-	
-	return tilesetPaths;
+	dungeon.tiles[id].available = tile.available;	
 }
-function GetNeighborTilesetArray( paths ) {
-	var tilesetArray = { 'left' : false, 'top' : false, 'right' : false, 'bottom' : false };
+function SetRequiredByTileset( id ) {	
+	var tile = dungeon.tiles[id];
 	
-	if( paths.left ) { tilesetArray.left = GetNeighborByTileset( paths.left ); }
-	if( paths.right ) { tilesetArray.right = GetNeighborByTileset( paths.right ); }
-	if( paths.top ) { tilesetArray.top = GetNeighborByTileset( paths.top ); }
-	if( paths.bottom ) { tilesetArray.bottom = GetNeighborByTileset( paths.bottom ); }
-	
-	return tilesetArray;
+	switch ( tile.type ) {
+		case 'blank' :
+			tile.required.left = true;
+			tile.required.bottom = true;
+			tile.required.right = true;
+			tile.required.top = true;
+			break;
+		case 'blocked' :
+			tile.required.left = false;
+			tile.required.bottom = false;
+			tile.required.right = false;
+			tile.required.top = false;
+			break;
+		case 'X' :
+			tile.required.left = true;
+			tile.required.bottom = true;
+			tile.required.right = true;
+			tile.required.top = true;
+			break;
+		case 'T1' : 
+			tile.required.left = true;
+			tile.required.bottom = true;
+			tile.required.right = true;
+			tile.required.top = false;
+			break;
+		case 'T2' : 
+			tile.required.left = true;
+			tile.required.bottom = true;
+			tile.required.right = false;
+			tile.required.top = true;
+			break;
+		case 'T3' : 
+			tile.required.left = true;
+			tile.required.bottom = false;
+			tile.required.right = true;
+			tile.required.top = true;
+			break;
+		case 'T4' : 
+			tile.required.left = false;
+			tile.required.bottom = true;
+			tile.required.right = true;
+			tile.required.top = true;
+			break;
+		case 'hallway1' : 
+			tile.required.left = true;
+			tile.required.bottom = false;
+			tile.required.right = true;
+			tile.required.top = false;
+			break;
+		case 'hallway2' : 
+			tile.required.left = false;
+			tile.required.bottom = true;
+			tile.required.right = false;
+			tile.required.top = true;
+			break;
+		case 'cap1' : 
+			tile.required.left = true;
+			tile.required.bottom = false;
+			tile.required.right = false;
+			tile.required.top = false;
+			break;
+		case 'cap2' : 
+			tile.required.left = false;
+			tile.required.bottom = true;
+			tile.required.right = false;
+			tile.required.top = false;
+			break;
+		case 'cap3' : 
+			tile.required.left = false;
+			tile.required.bottom = false;
+			tile.required.right = true;
+			tile.required.top = false;
+			break;
+		case 'cap4' : 
+			tile.required.left = false;
+			tile.required.bottom = false;
+			tile.required.right = false;
+			tile.required.top = true;
+			break;
+	}
+	dungeon.tiles[id].required = tile.required;	
 }
 function ResetDungeon() {
 	startCol = parseInt( document.getElementById('dungeon_startingCol').value );
 	startRow = parseInt( document.getElementById('dungeon_startingRow').value );
 	gridWidth = parseInt( document.getElementById('dungeon_width').value );
 	gridHeight = parseInt( document.getElementById('dungeon_height').value );
+	if( !document.getElementById('autoDraw').checked ) { clearTimeout(autoDraw); }
 
 	/* Force startCol/Row to stay on the grid. */
 	if( Number(startCol) > Number(gridWidth) ) { startCol = gridWidth; document.getElementById('dungeon_startingCol').value = startCol; }
 	if( Number(startRow) > Number(gridHeight) ) { startRow = gridHeight; document.getElementById('dungeon_startingRow').value = startRow; }
 
 	CreateDungeonGrid();
-
-
-	AssignTile( GetTileIdFromCoordinates( [ startRow, startCol ] ) );
+	drawList = [];
+	AssignTile( GetTileIdFromCoordinates( { 'x' : startRow, 'y' : startCol } ) );
+	
+	if( document.getElementById('autoDraw').checked ) { autoDraw = setTimeout( DrawNewTileCard, 500 ); }
+//	else { clearTimeout(autoDraw); }
 }
 function DisplayTileLabels( drawList_x, id ) {
 	var display = 'display: none; ';
@@ -345,17 +403,17 @@ function DisplayTileLabels( drawList_x, id ) {
 	var thisLabel = document.getElementById(id);
 	thisLabel.innerHTML = '<div class="tileLabel" style="'+display+'"><div>#' +drawList_x+'</div><div style="clear: both;">Tile_'+id+'</div></div>';
 }
-function TileReveal( x ) {
-	setTimeout( function() {
-		var thisDiv = document.getElementById( 'tile_' + drawList[x] );
-		if( thisDiv ) { thisDiv.classList.replace('hiddenTile', 'tile'); }
-	}, 0050 * x );
+function DrawNewTileCard() {
+	var divs = document.getElementsByClassName( 'move-available' );
+	var id = Math.floor(Math.random() * divs.length);
+
+	divs[id].click();
+	if( drawList.length < document.getElementById('tool_limit').value ) { setTimeout( DrawNewTileCard, 500 ); }
 }
 function GetTileIdFromCoordinates( coordinates ) {
 	var targetTileId = false;
-	
 	if( ValidateCoordinates( coordinates ) ) {
-		var queryString = '.col_'+coordinates[0]+'.row_'+coordinates[1];
+		var queryString = '.col_'+coordinates.x+'.row_'+coordinates.y;
 		targetTileId = document.querySelectorAll( queryString )[0].id.replace('tile_','');
 	}
 	
@@ -364,8 +422,8 @@ function GetTileIdFromCoordinates( coordinates ) {
 function ValidateCoordinates( coordinates ) {
 	var status = false;
 	
-	if( coordinates[0] >= 1 && coordinates[0] <= gridWidth) {
-		if( coordinates[1] >= 1 && coordinates[1] <= gridHeight) { status = true; }
+	if( coordinates.x >= 1 && coordinates.x <= gridWidth) {
+		if( coordinates.y >= 1 && coordinates.y <= gridHeight) { status = true; }
 	}
 	
 	return status;
