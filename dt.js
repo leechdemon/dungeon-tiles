@@ -28,12 +28,13 @@ const autodraw = '';
 
 function DrawList_AddNeighbors( id  ) {
 	var available = dungeon.tiles[ id ].available;
+	var required = dungeon.tiles[ id ].required;
 	var neighbors = dungeon.tiles[ id ].neighbors;	
 		
-	if( available.left ) { document.getElementById( 'tile_'+neighbors.left ).classList.add( 'move-available' ); }
-	if( available.right ) { document.getElementById( 'tile_'+neighbors.right ).classList.add( 'move-available' ); }
-	if( available.top ) { document.getElementById( 'tile_'+neighbors.top ).classList.add( 'move-available'); }
-	if( available.bottom ) { document.getElementById( 'tile_'+neighbors.bottom ).classList.add( 'move-available' ); }
+	if( available.left && required.left ) { document.getElementById( 'tile_'+neighbors.left ).classList.add( 'move-available' ); }
+	if( available.right && required.right ) { document.getElementById( 'tile_'+neighbors.right ).classList.add( 'move-available' ); }
+	if( available.top && required.top ) { document.getElementById( 'tile_'+neighbors.top ).classList.add( 'move-available'); }
+	if( available.bottom && required.bottom ) { document.getElementById( 'tile_'+neighbors.bottom ).classList.add( 'move-available' ); }
 }
 function AssignTile( id ) {
 	console.log( id );
@@ -108,9 +109,10 @@ function AssignTile( id ) {
 		var div = document.getElementById( 'tile_' + id );
 		div.classList.add( 'tile-' + randomProp );
 		div.classList.replace('tile-blank', 'tile');
+		div.classList.remove('move-available');
 
 	SetRequiredByTileset( id ); 
-	SetAvailableByTileset( id );
+//	SetAvailableByTileset( id );
 
 	DrawList_AddNeighbors( id );
 	AutoDrawHallwayTiles( id );
@@ -184,12 +186,16 @@ function SetAvailableByNeighbors( id ) {
 	
 	thisDiv  = document.getElementById( 'tile_' + tile.neighbors.left );	
 	if( thisDiv && thisDiv.classList.contains( 'tile-blank' ) ) { tile.available.left = true; }
+	else { tile.available.left = false; }
 	thisDiv  = document.getElementById( 'tile_' + tile.neighbors.top );	
 	if( thisDiv && thisDiv.classList.contains( 'tile-blank' ) ) { tile.available.top = true; }
+	else { tile.available.top = false; }
 	thisDiv  = document.getElementById( 'tile_' + tile.neighbors.right );	
 	if( thisDiv && thisDiv.classList.contains( 'tile-blank' ) ) { tile.available.right = true; }
+	else { tile.available.right = false; }
 	thisDiv  = document.getElementById( 'tile_' + tile.neighbors.bottom );	
 	if( thisDiv && thisDiv.classList.contains( 'tile-blank' ) ) { tile.available.bottom = true; }
+	else { tile.availablebottomt = false; }
 	
 	tile = dungeon.tiles[id];
 }
@@ -295,13 +301,13 @@ function SetAvailableByTileset( id ) {
 }
 function SetRequiredByTileset( id ) {	
 	var tile = dungeon.tiles[id];
-	
+
 	switch ( tile.type ) {
 		case 'blank' :
-			tile.required.left = true;
-			tile.required.bottom = true;
-			tile.required.right = true;
-			tile.required.top = true;
+			tile.required.left = false;
+			tile.required.bottom = false;
+			tile.required.right = false;
+			tile.required.top = false;
 			break;
 		case 'blocked' :
 			tile.required.left = false;

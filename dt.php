@@ -1,4 +1,4 @@
-<?php $version = "0.3.0"; ?>
+<?php $version = "0.3.1"; ?>
 
 <style>
 	#dungeonWindow { width: 75%; background-color: #2d303d; }
@@ -16,7 +16,7 @@
 /*	.tile:hover .tileLabel { display: block !important; } */
 	.tileLabel { font-weight: 800; font-size: smaller; }
 	
-	.move-available { background-color: #ff000044; }
+	.move-available { background-color: #ff000044; background-image: unset !important; }
 	.move-available:hover { background-color: #ff000099; }
 
 	.tile-X { background-image: url("/wp-content/uploads/2024/05/tile-x.jpg"); transform: scale(1.05); }
